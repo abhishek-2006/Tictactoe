@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tictactoe/homeScreen.dart';
 import 'SplashScreen.dart';
 
 void main() {
