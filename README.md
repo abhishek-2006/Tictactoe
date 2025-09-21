@@ -33,6 +33,15 @@ A modern, cross-platform **Tic Tac Toe** game built using **Flutter**. Play agai
    ```bash
    flutter run
 
+## Contributing
+Contributions to Tic Tac Toe are welcome! To contribute, follow these steps:
+
+1. Fork this repository
+2. Create a new branch for your feature or bug fix
+3. Make your changes and commit them
+4. Push your changes to your forked repository
+5. Submit a pull request for review
+
 ## 📄 License
 Licensed under the **MIT License**. Feel free to use, modify, and distribute.
 
