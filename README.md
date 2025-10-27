@@ -23,7 +23,7 @@ A modern, cross-platform **Tic Tac Toe** game built using **Flutter**. Play agai
 
 1. Clone this repository to your local machine:
    ```bash
-   git clone [https://github.com/abhishek-2006/Tictactoe.git](https://github.com/abhishek-2006/Tictactoe.git)
+   git clone https://github.com/abhishek-2006/Tictactoe.git
    ```
 
 2. Move to project directory
