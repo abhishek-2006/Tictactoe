@@ -1,15 +1,19 @@
 # Tictactoe
 
-A modern, cross-platform **Tic Tac Toe** game built using **Flutter**. Play against your friend or the computer in **easy**, **medium**, or **hard** mode.
+A modern, cross-platform **Tic Tac Toe** game built using **Flutter**. Play against your friend or the computer in **easy**, **medium**, **hard** or **legend** mode.
 
 ## 🚀 Features
 
-- 🎮 Play against **Computer** (Easy, Medium, Hard)
+- 🎮 Play against **Computer** (Easy, Medium, Hard, Legend)
 - 👬 Play with **Friend (1v1)**
-- 🌈 Custom splash screen
+- ✨ **Real-Time Theme Synchronization** (Dark/Light mode updates instantly)
+- 💾 **Persistent Theme Preference** (Saves theme locally using `shared_preferences`)
 - 🧠 Smart AI logic
 - 📱 Responsive for mobile (Android/iOS)
-- 🎨 Beautiful and minimal UI
+- 🎨 Beautiful UI
+- 📳 **Haptic Feedback**
+- 💥 **State Management** using **Provider**
+- 🌈 Custom splash screen
 
 ## ➤ Prerequisites:
 - [Flutter SDK](https://flutter.dev/docs/get-started/install)
@@ -19,19 +23,23 @@ A modern, cross-platform **Tic Tac Toe** game built using **Flutter**. Play agai
 
 1. Clone this repository to your local machine:
    ```bash
-   git clone https://github.com/abhishek-2006/Tictactoe.git
+   git clone [https://github.com/abhishek-2006/Tictactoe.git](https://github.com/abhishek-2006/Tictactoe.git)
+   ```
 
 2. Move to project directory
    ```bash
    cd Tictactoe
+   ```
 
 3. Get Dependencies
    ```bash
    flutter pub get
+   ```
 
 4. Run the App
    ```bash
    flutter run
+   ```
 
 ## Contributing
 Contributions to Tic Tac Toe are welcome! To contribute, follow these steps:
