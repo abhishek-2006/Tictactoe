@@ -1,32 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../settings.dart';
 
-class PlayerScreen extends StatelessWidget {
-  const PlayerScreen({Key? key}) : super(key: key);
+// --- THEME PALETTES (Copied for self-containment) ---
+// Dark Theme Colors
+const Color _kDarkAccentColor = Color(0xFF00BCD4);
+const Color _kDarkBackgroundColor = Color(0xFF0F172A);
+const Color _kDarkCardColor = Color(0xFF1E293B);
+const Color _kDarkTextColor = Colors.white;
+
+// Light Theme Colors
+const Color _kLightAccentColor = Color(0xFF00BCD4);
+const Color _kLightBackgroundColor = Color(0xFFF0F4F8);
+const Color _kLightCardColor = Colors.white;
+const Color _kLightTextColor = Color(0xFF1E293B);
+
+// Player Colors (Constant for contrast regardless of theme)
+const Color _kPlayerXColor = Color(0xFFBF9F19); // Gold
+const Color _kPlayerOColor = Color(0xFF1C89E3); // Bright Blue
+
+class PlayerScreen extends StatefulWidget {
+  final bool isDarkTheme;
+  final Function(bool) onThemeChanged;
+  const PlayerScreen({super.key, required this.isDarkTheme, required this.onThemeChanged});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF6B9DCF),
-        title: const Text('1v1 Player'),
-      ),
-      body: TicTacToeGame(),
-    );
-  }
+  State<PlayerScreen> createState() => _PlayerScreenState();
 }
 
-class TicTacToeGame extends StatefulWidget {
-  @override
-  _TicTacToeGameState createState() => _TicTacToeGameState();
-}
+class _PlayerScreenState extends State<PlayerScreen> {
+  // Game State
+  List<List<String>> _board = List.generate(3, (_) => List.filled(3, ''));
+  String _currentPlayer = 'X';
+  bool _gameFinished = false;
+  String _message = 'Player X Turn';
 
-class _TicTacToeGameState extends State<TicTacToeGame> {
-  late List<List<String>> _board;
-  late String _currentPlayer;
-  late bool _gameOver;
-  late String _winner;
-  int _playerXScore = 0; // Player X's score
-  int _playerOScore = 0; // Player O's score
+  // Score
+  int _playerXScore = 0;
+  int _playerOScore = 0;
+  int _draws = 0;
 
   @override
   void initState() {
@@ -34,230 +46,316 @@ class _TicTacToeGameState extends State<TicTacToeGame> {
     _resetGame();
   }
 
+  // Dynamic Color Getters for the current screen
+  Color get _currentAccentColor => widget.isDarkTheme ? _kDarkAccentColor : _kLightAccentColor;
+  Color get _currentBackgroundColor => widget.isDarkTheme ? _kDarkBackgroundColor : _kLightBackgroundColor;
+  Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
+  Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
+  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withOpacity(0.5) : _kLightTextColor.withOpacity(0.5);
+
   void _resetGame() {
     setState(() {
       _board = List.generate(3, (_) => List.filled(3, ''));
       _currentPlayer = 'X';
-      _gameOver = false;
-      _winner = ''; // Initialize _winner as an empty string
+      _gameFinished = false;
+      _message = 'Player X Turn';
     });
   }
 
   void _handleTap(int row, int col) {
-    if (_board[row][col] == '' && !_gameOver) {
+    if (_board[row][col] == '' && !_gameFinished) {
+      HapticFeedback.lightImpact();
       setState(() {
         _board[row][col] = _currentPlayer;
-        if (_checkWinner(row, col)) {
-          _gameOver = true;
-          _winner = _currentPlayer;
-          _updateScore();
-          _showGameResultDialog();
-        } else if (_isBoardFull()) {
-          _gameOver = true;
-          _showGameResultDialog();
+
+        if (_checkWin(row, col)) {
+          _gameFinished = true;
+          _message = 'Player $_currentPlayer Wins!';
+          if (_currentPlayer == 'X') {
+            _playerXScore++;
+          } else {
+            _playerOScore++;
+          }
+          _showFinishDialog(_message, _currentPlayer);
+        } else if (_checkDraw()) {
+          _gameFinished = true;
+          _message = 'It\'s a Draw!';
+          _draws++;
+          _showFinishDialog(_message, null);
         } else {
           _currentPlayer = _currentPlayer == 'X' ? 'O' : 'X';
+          _message = 'Player $_currentPlayer Turn';
         }
       });
+    } else if (_gameFinished) {
+      _showFinishDialog(_message, null);
     }
   }
 
-  void _showGameResultDialog() {
-    String title;
+  bool _checkWin(int row, int col) {
+    String player = _board[row][col];
 
-    if (_winner == 'X') {
-      title = 'Player X Wins';
-    } else if (_winner == 'O') {
-      title = 'Player O Wins';
-    } else {
-      title = 'IT\'S A DRAW';
-    }
+    // Check Row
+    if (_board[row].every((cell) => cell == player)) return true;
+
+    // Check Column
+    if (_board.every((r) => r[col] == player)) return true;
+
+    // Check Main Diagonal (top-left to bottom-right)
+    if (row == col && List.generate(3, (i) => _board[i][i]).every((cell) => cell == player)) return true;
+
+    // Check Anti-Diagonal (top-right to bottom-left)
+    if (row + col == 2 && List.generate(3, (i) => _board[i][2 - i]).every((cell) => cell == player)) return true;
+
+    return false;
+  }
+
+  bool _checkDraw() {
+    return _board.every((row) => row.every((cell) => cell != ''));
+  }
+
+  void _showFinishDialog(String message, String? winner) {
+    Color dialogColor = winner == 'X' ? _kPlayerXColor : winner == 'O' ? _kPlayerOColor : _currentAccentColor;
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) =>
-          Dialog(
-            backgroundColor: Colors.transparent,
-            child: Center(
-              child: Container(
-                width: 350,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 30, horizontal: 24),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2E2E2E), // dark card
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                        _resetGame();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 32),
-                        decoration: BoxDecoration(
-                          color: Color(0xEF636363),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          'PLAY AGAIN',
-                          style: TextStyle(
-                            color: Color(0xFFECD875),
-                            fontWeight: FontWeight.w800,
-                            fontSize: 26,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          backgroundColor: _currentCardColor,
+          title: Text(
+            'Game Over',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: dialogColor,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          content: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: _currentTextColor,
+              fontSize: 18,
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _resetGame();
+                HapticFeedback.mediumImpact();
+              },
+              child: Text('Play Again', style: TextStyle(color: dialogColor)),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  void _updateScore() {
-    if (_winner == 'X') {
-      _playerXScore++;
-    } else if (_winner == 'O') {
-      _playerOScore++;
-    }
+  // --- UI Building Widgets ---
+
+  Widget _buildScoreboard() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        // Player X Score
+        _buildScoreColumn(
+          label: 'PLAYER X',
+          score: _playerXScore,
+          color: _kPlayerXColor,
+        ),
+        // Draws Score
+        _buildScoreColumn(
+          label: 'DRAWS',
+          score: _draws,
+          color: _currentAccentColor,
+        ),
+        // Player O Score
+        _buildScoreColumn(
+          label: 'PLAYER O',
+          score: _playerOScore,
+          color: _kPlayerOColor,
+        ),
+      ],
+    );
   }
 
-  bool _checkWinner(int row, int col) {
-    // Check row
-    if (_board[row].every((cell) => cell == _currentPlayer)) {
-      return true;
-    }
-    // Check column
-    if (_board.every((row) => row[col] == _currentPlayer)) {
-      return true;
-    }
-    // Check diagonals
-    if (row == col &&
-        _board.every((row) => row[_board.indexOf(row)] == _currentPlayer)) {
-      return true;
-    }
-    if (row + col == 2 &&
-        _board.every((row) => row[2 - _board.indexOf(row)] == _currentPlayer)) {
-      return true;
-    }
-    return false;
+  Widget _buildScoreColumn({required String label, required int score, required Color color}) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: color.withOpacity(0.8),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '$score',
+          style: TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.w900,
+            color: color,
+            shadows: [
+              BoxShadow(
+                color: color.withOpacity(0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
-  bool _isBoardFull() {
-    return _board.every((row) => row.every((cell) => cell != ''));
+  Widget _buildBoard() {
+    // Corrected board size calculation to prevent line flow-out.
+    const double boardSize = 330;
+    const double lineThickness = 3.0;
+    // Calculate cell size: (Total Size - Total Line Width) / Number of Cells
+    const double cellSize = (boardSize - (2 * lineThickness)) / 3; // (330 - 6) / 3 = 108.0
+
+    return Container(
+      width: boardSize,
+      height: boardSize,
+      decoration: BoxDecoration(
+        color: _currentCardColor,
+        borderRadius: BorderRadius.circular(12),
+        // Applying a subtle shadow for depth
+        boxShadow: [
+          BoxShadow(
+            color: _currentBoardLineColor.withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Table(
+        // IMPORTANT: Use symmetric to draw ONLY INNER lines, removing the outside box border
+        border: TableBorder.symmetric(
+          inside: BorderSide(
+            width: lineThickness,
+            color: _currentBoardLineColor,
+          ),
+        ),
+        children: List.generate(3, (row) {
+          return TableRow(
+            children: List.generate(3, (col) {
+              // Now passing the calculated cellSize
+              return _buildCell(row, col, cellSize);
+            }),
+          );
+        }),
+      ),
+    );
+  }
+
+  // **UPDATED**: Now accepts size parameter and uses it for cell dimensions.
+  Widget _buildCell(int row, int col, double size) {
+    // The GestureDetector is critical here for registering taps
+    return GestureDetector(
+      onTap: () => _handleTap(row, col),
+      child: Container(
+        width: size, // Use calculated size
+        height: size, // Use calculated size
+        // Cell background is transparent to let the _currentCardColor show through
+        color: Colors.transparent,
+        child: Center(
+          child: Text(
+            _board[row][col],
+            style: TextStyle(
+              fontSize: 55,
+              fontWeight: FontWeight.w800,
+              color: _board[row][col] == 'X' ? _kPlayerXColor : _kPlayerOColor,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFDDF0F8),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(height: 80),
-          _buildScoreBoard(),
-          SizedBox(height: 30),
-          _buildBoard(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildScoreBoard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Column(
-            children: [
-              Text('Player X',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              Text('$_playerXScore', style: TextStyle(fontSize: 22)),
-            ],
-          ),
-          Column(
-            children: [
-              Text('Player O',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              Text('$_playerOScore', style: TextStyle(fontSize: 22)),
-            ],
+      backgroundColor: _currentBackgroundColor,
+      appBar: AppBar(
+        title: Text('VS FRIEND', style: TextStyle(color: _currentTextColor)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: _currentTextColor),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: _currentTextColor),
+          onPressed: () {
+            HapticFeedback.mediumImpact();
+            Navigator.of(context).pop();
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Settings(
+                  isDarkTheme: widget.isDarkTheme,
+                  onThemeChanged: widget.onThemeChanged,
+                )),
+              );
+            },
           ),
         ],
       ),
-    );
-  }
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
 
-  Widget _buildBoard() {
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(height: 20), // Space before the turn text
-          Text(
-            "Player $_currentPlayer's Turn",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 40), // Space between turn text and grid
-          Container(
-            width: 330, // Adjust this width as needed
-            child: Table(
-              border: TableBorder.symmetric(
-                inside: BorderSide(
-                  width: 3,
-                  color: Colors.black,
+              _buildScoreboard(),
+
+              const SizedBox(height: 60.0),
+
+              Padding(
+                padding: const EdgeInsets.only(bottom: 30.0),
+                child: Text(
+                  _message,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: _message.contains('X Turn') ? _kPlayerXColor : _message.contains('O Turn') ? _kPlayerOColor : _currentTextColor,
+                  ),
                 ),
               ),
-              children: List.generate(3, (row) {
-                return TableRow(
-                  children: List.generate(3, (col) {
-                    return _buildCell(row, col);
-                  }),
-                );
-              }),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildCell(int row, int col) {
-    return GestureDetector(
-      onTap: () => _handleTap(row, col),
-      child: Container(
-        width: 110,
-        height: 110,
-        decoration: BoxDecoration(
-          border: Border(),
-        ),
-        child: Center(
-          child: Text(
-            _board[row][col],
-            style: TextStyle(
-              fontSize: 40,
-              color: _board[row][col] == 'X' ? Color(0xFFBF9F19) // Yellow
-                  : _board[row][col] == 'O'
-                  ? Color(0xFF1C89E3) // Blue
-                  : Colors.black,
-            ),
+              _buildBoard(),
+
+              Padding(
+                padding: const EdgeInsets.only(top: 40.0, bottom: 40.0),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    _resetGame();
+                  },
+                  icon: const Icon(Icons.refresh, size: 28),
+                  label: const Text('New Game', style: TextStyle(fontSize: 20)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _currentAccentColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    elevation: 5,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
