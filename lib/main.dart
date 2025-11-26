@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'homeScreen.dart';
+import 'home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -120,7 +120,7 @@ class SplashDeciderState extends State<SplashDecider> {
       // Show the custom Flutter splash screen
       return FlutterSplashScreen(isDarkTheme: widget.isDarkTheme);
     } else {
-      // Transition to the main menu (homeScreen.dart)
+      // Transition to the main menu (home_screen.dart)
       return TicTacToeMenu(
         isDarkTheme: widget.isDarkTheme, // PASS PROP
         onThemeChanged: widget.onThemeChanged, // PASS CALLBACK
@@ -167,12 +167,12 @@ class FlutterSplashScreen extends StatelessWidget {
                     letterSpacing: 1.5,
                   ),
                 ),
-                Text(
+                const Text(
                   'Abhishek Shah',
                   style: TextStyle(
                     fontSize: 24,
                     fontFamily: 'Roboto',
-                    color: const Color(0xFF2C64A7),
+                    color: Color(0xFF2C64A7),
                     fontWeight: FontWeight.w800,
                   ),
                 ),

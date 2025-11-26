@@ -51,7 +51,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Color get _currentBackgroundColor => widget.isDarkTheme ? _kDarkBackgroundColor : _kLightBackgroundColor;
   Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withOpacity(0.5) : _kLightTextColor.withOpacity(0.5);
+  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withAlpha(128) : _kLightTextColor.withAlpha(128);
 
   void _resetGame() {
     setState(() {
@@ -192,7 +192,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: color.withOpacity(0.8),
+            color: color.withAlpha(204),
           ),
         ),
         const SizedBox(height: 4),
@@ -204,7 +204,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             color: color,
             shadows: [
               BoxShadow(
-                color: color.withOpacity(0.4),
+                color: color.withAlpha(102),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -231,7 +231,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         // Applying a subtle shadow for depth
         boxShadow: [
           BoxShadow(
-            color: _currentBoardLineColor.withOpacity(0.3),
+            color: _currentBoardLineColor.withAlpha(77),
             blurRadius: 10,
             spreadRadius: 2,
           ),

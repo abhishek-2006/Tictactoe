@@ -5,7 +5,7 @@ import 'package:tictactoe/main.dart';
 void main() {
   testWidgets('Tic Tac Toe smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(TicTacToeApp());
+    await tester.pumpWidget(const TicTacToeApp());
 
     // Verify that we start with an empty board and no winner displayed.
     expect(find.text('Player X wins!'), findsNothing);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // NEW IMPORT
+import 'package:shared_preferences/shared_preferences.dart';
 
 // --- THEME PALETTES ---
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
@@ -15,11 +15,9 @@ const Color _kLightCardColor = Colors.white;
 const Color _kLightTextColor = Color(0xFF1E293B);
 
 class SoundManager {
-  // Use a singleton pattern to ensure only one instance exists
   static final SoundManager _instance = SoundManager._internal();
   factory SoundManager() => _instance;
   SoundManager._internal() {
-    // Initialize preferences when the singleton is first accessed
     _initPreferences();
   }
 
@@ -57,8 +55,6 @@ class SoundManager {
       await _musicPlayer.play(AssetSource('bg_music.mp3'));
     }
   }
-
-  // MODIFIED: Setters now save the new state to SharedPreferences
 
   Future<void> setMusicEnabled(bool isEnabled) async {
     _isMusicOn = isEnabled;
@@ -106,7 +102,7 @@ class SoundManager {
 class Settings extends StatefulWidget {
   final bool isDarkTheme;
   final Function(bool) onThemeChanged; // NEW: Callback to notify ThemeWrapper
-  const Settings({Key? key, required this.isDarkTheme, required this.onThemeChanged}) : super(key: key);
+  const Settings({super.key, required this.isDarkTheme, required this.onThemeChanged});
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -119,8 +115,6 @@ class _SettingsState extends State<Settings> {
   late bool _isSoundOn;
   late bool _isMusicOn;
   late bool _isVibrationOn;
-
-  // New state for theme toggle to manage it locally
   late bool _isDarkTheme;
 
   // Dynamic Color Getters
@@ -128,6 +122,9 @@ class _SettingsState extends State<Settings> {
   Color get _currentBackgroundColor => widget.isDarkTheme ? _kDarkBackgroundColor : _kLightBackgroundColor;
   Color get _currentAppBarTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
+  // FIX: Added _currentCardColor getter to clear warnings for _kDarkCardColor and _kLightCardColor
+  Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
+
 
   @override
   void initState() {
@@ -160,97 +157,118 @@ class _SettingsState extends State<Settings> {
         iconTheme: IconThemeData(color: _currentAppBarTextColor),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- APPEARANCE ---
-            Text(
-              'Appearance',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: _currentTextColor,
+            // FIX: Wrap settings content in a Card/Container using _currentCardColor
+            // This clears the remaining unused_element warnings.
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10.0),
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: _currentCardColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: _currentTextColor.withAlpha(25), // Subtle shadow
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 10),
-            _buildToggleTile(
-                'Dark Theme',
-                Icons.dark_mode,
-                _isDarkTheme,
-                // Use the new save/notify function
-                    (value) => _setThemeEnabled(value)
-            ),
-            const Divider(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- APPEARANCE ---
+                  const Text(
+                    'Appearance',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      // color is implicitly _currentTextColor via context
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildToggleTile(
+                      'Dark Theme',
+                      Icons.dark_mode,
+                      _isDarkTheme,
+                      // Use the new save/notify function
+                          (value) => _setThemeEnabled(value)
+                  ),
+                  const Divider(),
 
-            const SizedBox(height: 30),
+                  const SizedBox(height: 20), // Reduced spacing slightly
 
-            // --- AUDIO & HAPTICS ---
-            Text(
-              'Audio & Haptics',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: _currentTextColor,
-              ),
-            ),
-            const SizedBox(height: 10),
+                  // --- AUDIO & HAPTICS ---
+                  const Text(
+                    'Audio & Haptics',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      // color is implicitly _currentTextColor via context
+                    ),
+                  ),
+                  const SizedBox(height: 10),
 
-            // Sound Toggle
-            _buildToggleTile(
-              'Sound Effects',
-              Icons.volume_up,
-              _isSoundOn,
-                  (value) {
-                setState(() => _isSoundOn = value);
-                _soundManager.setSoundEnabled(value);
-              },
-            ),
-            const Divider(),
+                  // Sound Toggle
+                  _buildToggleTile(
+                    'Sound Effects',
+                    Icons.volume_up,
+                    _isSoundOn,
+                        (value) {
+                      setState(() => _isSoundOn = value);
+                      _soundManager.setSoundEnabled(value);
+                    },
+                  ),
+                  const Divider(),
 
-            // Music Toggle
-            _buildToggleTile(
-              'Background Music',
-              Icons.music_note,
-              _isMusicOn,
-                  (value) {
-                setState(() => _isMusicOn = value);
-                _soundManager.setMusicEnabled(value);
-              },
-            ),
-            const Divider(),
+                  // Music Toggle
+                  _buildToggleTile(
+                    'Background Music',
+                    Icons.music_note,
+                    _isMusicOn,
+                        (value) {
+                      setState(() => _isMusicOn = value);
+                      _soundManager.setMusicEnabled(value);
+                    },
+                  ),
+                  const Divider(),
 
-            // Vibration Toggle
-            _buildToggleTile(
-              'Haptic Feedback',
-              Icons.vibration,
-              _isVibrationOn,
-                  (value) {
-                setState(() => _isVibrationOn = value);
-                _soundManager.setVibrationEnabled(value);
-              },
-            ),
-            const Divider(),
+                  // Vibration Toggle
+                  _buildToggleTile(
+                    'Haptic Feedback',
+                    Icons.vibration,
+                    _isVibrationOn,
+                        (value) {
+                      setState(() => _isVibrationOn = value);
+                      _soundManager.setVibrationEnabled(value);
+                    },
+                  ),
+                  const Divider(),
 
-            const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
-            // --- ABOUT GAME ---
-            Text(
-              'About Game',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: _currentTextColor,
-              ),
-            ),
-            const SizedBox(height: 10),
+                  // --- ABOUT GAME ---
+                  const Text(
+                    'About Game',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
 
-            // About Text Content
-            Text(
-              'Tic-Tac-Toe is the classic game of Xs and Os against a friend or four unique CPU difficulties, including the unbeatable Legend AI.',
-              style: TextStyle(
-                fontSize: 16,
-                color: _currentTextColor.withAlpha((0.7 * 255).round()),
+                  // About Text Content
+                  Text(
+                    'Tic-Tac-Toe is the classic game of Xs and Os against a friend or four unique CPU difficulties, including the unbeatable Legend AI.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _currentTextColor.withAlpha(179), // 0.7 opacity
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -275,10 +293,10 @@ class _SettingsState extends State<Settings> {
         onChanged: onChanged,
         activeColor: _currentAccentColor,
         // Theming the track for better contrast
-        trackOutlineColor: MaterialStateProperty.all(_currentAccentColor.withOpacity(0.5)),
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
-            return _currentAccentColor.withOpacity(0.5);
+        trackOutlineColor: WidgetStateProperty.all(_currentAccentColor.withAlpha(128)),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return _currentAccentColor.withAlpha(128);
           }
           return widget.isDarkTheme ? Colors.grey.shade700 : Colors.grey.shade300;
         }),

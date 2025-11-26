@@ -26,13 +26,13 @@ const Color _kLegendModeColor = Color(0xFF673AB7);
 class LegendMode extends StatefulWidget {
   final bool isDarkTheme;
   final Function(bool) onThemeChanged;
-  const LegendMode({Key? key, required this.isDarkTheme, required this.onThemeChanged}) : super(key: key);
+  const LegendMode({super.key, required this.isDarkTheme, required this.onThemeChanged});
 
   @override
-  _LegendModeState createState() => _LegendModeState();
+  LegendModeState createState() => LegendModeState();
 }
 
-class _LegendModeState extends State<LegendMode> with SingleTickerProviderStateMixin {
+class LegendModeState extends State<LegendMode> with SingleTickerProviderStateMixin {
   // Game State and Logic (Aligned with easy_mode.dart)
   List<List<String>> _board = List.generate(3, (_) => List.generate(3, (_) => ''));
   String _currentPlayer = 'X';
@@ -54,7 +54,7 @@ class _LegendModeState extends State<LegendMode> with SingleTickerProviderStateM
   Color get _currentAccentColor => widget.isDarkTheme ? _kDarkAccentColor : _kLightAccentColor;
   Color get _currentAppBarTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withOpacity(0.5) : _kLightTextColor.withOpacity(0.5);
+  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withAlpha(128) : _kLightTextColor.withAlpha(128);
 
 
   @override
@@ -244,7 +244,7 @@ class _LegendModeState extends State<LegendMode> with SingleTickerProviderStateM
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           backgroundColor: _currentCardColor,
-          title: Text(
+          title: const Text(
             'Game Over',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -270,7 +270,7 @@ class _LegendModeState extends State<LegendMode> with SingleTickerProviderStateM
                   HapticFeedback.mediumImpact();
                 }
               },
-              child: Text('Play Again', style: TextStyle(color: _kLegendModeColor)), // Mode color
+              child: const Text('Play Again', style: TextStyle(color: _kLegendModeColor)), // Mode color
             ),
           ],
         );
@@ -310,7 +310,7 @@ class _LegendModeState extends State<LegendMode> with SingleTickerProviderStateM
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: color.withOpacity(0.8),
+            color: color.withAlpha(204),
           ),
         ),
         const SizedBox(height: 4),
@@ -322,7 +322,7 @@ class _LegendModeState extends State<LegendMode> with SingleTickerProviderStateM
             color: color,
             shadows: [
               BoxShadow(
-                color: color.withOpacity(0.4),
+                color: color.withAlpha(102),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -346,7 +346,7 @@ class _LegendModeState extends State<LegendMode> with SingleTickerProviderStateM
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: _currentBoardLineColor.withOpacity(0.3),
+            color: _currentBoardLineColor.withAlpha(77),
             blurRadius: 10,
             spreadRadius: 2,
           ),

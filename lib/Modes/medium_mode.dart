@@ -26,13 +26,13 @@ const Color _kMediumModeColor = Color(0xFFFF9800);
 class MediumMode extends StatefulWidget {
   final bool isDarkTheme;
   final Function(bool) onThemeChanged;
-  const MediumMode({Key? key, required this.isDarkTheme, required this.onThemeChanged}) : super(key: key);
+  const MediumMode({super.key, required this.isDarkTheme, required this.onThemeChanged});
 
   @override
-  _MediumModeState createState() => _MediumModeState();
+  MediumModeState createState() => MediumModeState();
 }
 
-class _MediumModeState extends State<MediumMode> with SingleTickerProviderStateMixin {
+class MediumModeState extends State<MediumMode> with SingleTickerProviderStateMixin {
   // Game State and Logic (Aligned with easy_mode.dart)
   List<List<String>> _board = List.generate(3, (_) => List.generate(3, (_) => ''));
   String _currentPlayer = 'X';
@@ -54,7 +54,7 @@ class _MediumModeState extends State<MediumMode> with SingleTickerProviderStateM
   Color get _currentAccentColor => widget.isDarkTheme ? _kDarkAccentColor : _kLightAccentColor;
   Color get _currentAppBarTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withOpacity(0.5) : _kLightTextColor.withOpacity(0.5);
+  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withAlpha(128) : _kLightTextColor.withAlpha(128);
 
 
   @override
@@ -238,7 +238,7 @@ class _MediumModeState extends State<MediumMode> with SingleTickerProviderStateM
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           backgroundColor: _currentCardColor,
-          title: Text(
+          title: const Text(
             'Game Over',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -264,7 +264,7 @@ class _MediumModeState extends State<MediumMode> with SingleTickerProviderStateM
                   HapticFeedback.mediumImpact();
                 }
               },
-              child: Text('Play Again', style: TextStyle(color: _kMediumModeColor)), // Mode color
+              child: const Text('Play Again', style: TextStyle(color: _kMediumModeColor)), // Mode color
             ),
           ],
         );
@@ -304,7 +304,7 @@ class _MediumModeState extends State<MediumMode> with SingleTickerProviderStateM
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: color.withOpacity(0.8),
+            color: color.withAlpha(204),
           ),
         ),
         const SizedBox(height: 4),
@@ -316,7 +316,7 @@ class _MediumModeState extends State<MediumMode> with SingleTickerProviderStateM
             color: color,
             shadows: [
               BoxShadow(
-                color: color.withOpacity(0.4),
+                color: color.withAlpha(102),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -340,7 +340,7 @@ class _MediumModeState extends State<MediumMode> with SingleTickerProviderStateM
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: _currentBoardLineColor.withOpacity(0.3),
+            color: _currentBoardLineColor.withAlpha(77),
             blurRadius: 10,
             spreadRadius: 2,
           ),

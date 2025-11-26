@@ -12,7 +12,7 @@ const Color _kDarkBackgroundColor = Color(0xFF0F172A);
 const Color _kDarkCardColor = Color(0xFF1E293B);
 const Color _kDarkTextColor = Colors.white;
 
-const Color _kLightAccentColor = Color(0xFF00BCD4);
+const Color _kLightAccentColor = Color(0xFF52D6FF);
 const Color _kLightBackgroundColor = Color(0xFFF0F4F8);
 const Color _kLightCardColor = Colors.white;
 const Color _kLightTextColor = Color(0xFF1E293B);
@@ -26,20 +26,20 @@ const Color _kLegendColor = Color(0xFF673AB7);    // Purple for Legend
 class ComputerScreen extends StatefulWidget {
   final bool isDarkTheme;
   final Function(bool) onThemeChanged; // NEW PROP
-  const ComputerScreen({Key? key, required this.isDarkTheme, required this.onThemeChanged}) : super(key: key);
+  const ComputerScreen({super.key, required this.isDarkTheme, required this.onThemeChanged});
 
   @override
-  _ComputerScreenState createState() => _ComputerScreenState();
+  ComputerScreenState createState() => ComputerScreenState();
 }
 
-class _ComputerScreenState extends State<ComputerScreen> {
+class ComputerScreenState extends State<ComputerScreen> {
   final SoundManager _soundManager = SoundManager();
 
   // Dynamic Color Getters
-  Color get _currentBackgroundColor => widget.isDarkTheme ? _kDarkBackgroundColor : _kLightBackgroundColor;
+  Color get _currentAccentColor => widget.isDarkTheme ? _kDarkAccentColor : _kLightAccentColor;
   Color get _currentAppBarTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
   Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
-  Color get _currentShadowColor => widget.isDarkTheme ? Colors.black.withOpacity(0.6) : Colors.grey.withOpacity(0.5);
+  Color get _currentShadowColor => widget.isDarkTheme ? Colors.black.withAlpha(153) : Colors.grey.withAlpha(128);
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
 
 
@@ -70,7 +70,7 @@ class _ComputerScreenState extends State<ComputerScreen> {
             decoration: BoxDecoration(
               color: _currentCardColor,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: color.withOpacity(0.4), width: 2),
+              border: Border.all(color: color.withAlpha(102), width: 2),
               boxShadow: [
                 BoxShadow(
                   color: _currentShadowColor,
@@ -78,7 +78,7 @@ class _ComputerScreenState extends State<ComputerScreen> {
                   offset: const Offset(0, 8),
                 ),
                 BoxShadow(
-                  color: color.withOpacity(0.2),
+                  color: color.withAlpha(51),
                   blurRadius: 4,
                   spreadRadius: -2,
                   offset: const Offset(0, 0),
@@ -109,7 +109,7 @@ class _ComputerScreenState extends State<ComputerScreen> {
                           softWrap: true,
                           style: TextStyle(
                             fontSize: 16,
-                            color: _currentTextColor.withOpacity(0.7),
+                            color: _currentTextColor.withAlpha(179),
                           ),
                         ),
                       ],
@@ -118,7 +118,7 @@ class _ComputerScreenState extends State<ComputerScreen> {
                   Icon(
                     icon,
                     size: 50,
-                    color: color.withOpacity(0.8),
+                    color: color.withAlpha(204),
                   ),
                 ],
               ),
@@ -187,7 +187,7 @@ class _ComputerScreenState extends State<ComputerScreen> {
 
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.settings),
+                  icon: Icon(Icons.settings, color: _currentAccentColor,),
                   onPressed: () {
                     if (_soundManager.isVibrationOn) {
                       HapticFeedback.lightImpact();

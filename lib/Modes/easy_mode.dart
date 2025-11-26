@@ -26,13 +26,13 @@ const Color _kEasyModeColor = Color(0xFF4CAF50);
 class EasyMode extends StatefulWidget {
   final bool isDarkTheme;
   final Function(bool) onThemeChanged;
-  const EasyMode({Key? key, required this.isDarkTheme, required this.onThemeChanged}) : super(key: key);
+  const EasyMode({super.key, required this.isDarkTheme, required this.onThemeChanged});
 
   @override
-  _EasyModeState createState() => _EasyModeState();
+  EasyModeState createState() => EasyModeState();
 }
 
-class _EasyModeState extends State<EasyMode> with SingleTickerProviderStateMixin {
+class EasyModeState extends State<EasyMode> with SingleTickerProviderStateMixin {
   // Game State and Logic
   List<List<String>> _board = List.generate(3, (_) => List.generate(3, (_) => ''));
   String _currentPlayer = 'X';
@@ -53,7 +53,7 @@ class _EasyModeState extends State<EasyMode> with SingleTickerProviderStateMixin
   Color get _currentAccentColor => widget.isDarkTheme ? _kDarkAccentColor : _kLightAccentColor;
   Color get _currentAppBarTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withOpacity(0.5) : _kLightTextColor.withOpacity(0.5);
+  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withAlpha(128) : _kLightTextColor.withAlpha(128);
 
   @override
   void initState() {
@@ -249,7 +249,7 @@ class _EasyModeState extends State<EasyMode> with SingleTickerProviderStateMixin
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           backgroundColor: _currentCardColor,
-          title: Text(
+          title: const Text(
             'Game Over',
             textAlign: TextAlign.center, // Center the title
             style: TextStyle(
@@ -275,7 +275,7 @@ class _EasyModeState extends State<EasyMode> with SingleTickerProviderStateMixin
                   HapticFeedback.mediumImpact();
                 }
               },
-              child: Text('Play Again', style: TextStyle(color: _kEasyModeColor)),
+              child: const Text('Play Again', style: TextStyle(color: _kEasyModeColor)),
             ),
           ],
         );
@@ -318,7 +318,7 @@ class _EasyModeState extends State<EasyMode> with SingleTickerProviderStateMixin
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: color.withOpacity(0.8),
+            color: color.withAlpha(204),
           ),
         ),
         const SizedBox(height: 4),
@@ -330,7 +330,7 @@ class _EasyModeState extends State<EasyMode> with SingleTickerProviderStateMixin
             color: color,
             shadows: [
               BoxShadow(
-                color: color.withOpacity(0.4),
+                color: color.withAlpha(102),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -354,7 +354,7 @@ class _EasyModeState extends State<EasyMode> with SingleTickerProviderStateMixin
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: _currentBoardLineColor.withOpacity(0.3),
+            color: _currentBoardLineColor.withAlpha(77),
             blurRadius: 10,
             spreadRadius: 2,
           ),

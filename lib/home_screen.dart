@@ -22,7 +22,7 @@ class TicTacToeMenu extends StatefulWidget {
   final bool isDarkTheme;
   final Function(bool) onThemeChanged;
 
-  const TicTacToeMenu({Key? key, required this.isDarkTheme, required this.onThemeChanged}) : super(key: key);
+  const TicTacToeMenu({super.key, required this.isDarkTheme, required this.onThemeChanged});
 
   @override
   State<TicTacToeMenu> createState() => _TicTacToeMenuState();
@@ -51,11 +51,10 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
 
   // Dynamic Color Getters now use widget.isDarkTheme
   Color get _currentAccentColor => widget.isDarkTheme ? _kDarkAccentColor : _kLightAccentColor;
-  Color get _currentBackgroundColor => widget.isDarkTheme ? _kDarkBackgroundColor : _kLightBackgroundColor;
   Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
   Color get _currentSubtitleColor => widget.isDarkTheme ? Colors.white70 : Colors.black54;
-  Color get _currentShadowColor => widget.isDarkTheme ? Colors.black.withOpacity(0.6) : Colors.grey.withOpacity(0.5);
+  Color get _currentShadowColor => widget.isDarkTheme ? Colors.black.withAlpha(123) : Colors.grey.withAlpha(128);
   Color get _currentSettingsIconColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
 
 
@@ -93,13 +92,13 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
               ),
               // Subtle glow effect
               BoxShadow(
-                color: _currentAccentColor.withOpacity(0.3),
+                color: _currentAccentColor.withAlpha(77),
                 blurRadius: 8,
                 spreadRadius: -2,
                 offset: const Offset(0, 0),
               ),
             ],
-            border: Border.all(color: _currentAccentColor.withOpacity(0.4), width: 1.5),
+            border: Border.all(color: _currentAccentColor.withAlpha(102), width: 1.5),
           ),
           child: Row(
             children: [
@@ -111,7 +110,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                   return Icon(
                     icon,
                     size: 48,
-                    color: Color.lerp(_currentAccentColor.withOpacity(0.7), _currentAccentColor, _controller.value),
+                    color: Color.lerp(_currentAccentColor.withAlpha(179), _currentAccentColor, _controller.value),
                   );
                 },
               ),
@@ -157,7 +156,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
       style: TextStyle(
         fontFamily: 'Roboto',
         fontSize: 20,
-        color: _currentAccentColor.withOpacity(0.8),
+        color: _currentAccentColor.withAlpha(204),
         fontWeight: FontWeight.w600,
       ),
     );
@@ -241,7 +240,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                     letterSpacing: 3.0,
                     shadows: [
                       BoxShadow(
-                        color: _currentAccentColor.withOpacity(0.4),
+                        color: _currentAccentColor.withAlpha(102),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
