@@ -257,7 +257,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
-  // **UPDATED**: Now accepts size parameter and uses it for cell dimensions.
   Widget _buildCell(int row, int col, double size) {
     // The GestureDetector is critical here for registering taps
     return GestureDetector(

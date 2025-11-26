@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:math';
-import '../settings.dart'; // Import SoundManager and Settings
+import '../settings.dart';
+
 
 // --- THEME PALETTES ---
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
