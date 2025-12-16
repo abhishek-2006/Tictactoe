@@ -19,6 +19,9 @@ const Color _kLightTextColor = Color(0xFF1E293B);
 const Color _kPlayerXColor = Color(0xFFBF9F19); // Gold
 const Color _kPlayerOColor = Color(0xFF1C89E3); // Bright Blue
 
+enum WinType { row, column, diagonalMain, diagonalAnti, }
+
+
 class PlayerScreen extends StatefulWidget {
   final bool isDarkTheme;
   final Function(bool) onThemeChanged;
@@ -34,6 +37,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
   String _currentPlayer = 'X';
   bool _gameFinished = false;
   String _message = 'Player X Turn';
+
+  WinType? _winType;
+  int _winIndex = -1;
+
 
   // Score
   int _playerXScore = 0;
@@ -59,6 +66,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
       _currentPlayer = 'X';
       _gameFinished = false;
       _message = 'Player X Turn';
+      _winType = null;
+      _winIndex = -1;
     });
   }
 
@@ -76,19 +85,28 @@ class _PlayerScreenState extends State<PlayerScreen> {
           } else {
             _playerOScore++;
           }
-          _showFinishDialog(_message, _currentPlayer);
+          Future.delayed(const Duration(seconds: 2), () {
+            if (!mounted) return;
+            _showFinishDialog(_message, _currentPlayer);
+          });
         } else if (_checkDraw()) {
           _gameFinished = true;
           _message = 'It\'s a Draw!';
           _draws++;
-          _showFinishDialog(_message, null);
+          Future.delayed(const Duration(seconds: 2), () {
+            if (!mounted) return;
+            _showFinishDialog(_message, null);
+          });
         } else {
           _currentPlayer = _currentPlayer == 'X' ? 'O' : 'X';
           _message = 'Player $_currentPlayer Turn';
         }
       });
     } else if (_gameFinished) {
-      _showFinishDialog(_message, null);
+      Future.delayed(const Duration(seconds: 2), () {
+        if (!mounted) return;
+        _showFinishDialog(_message, null);
+      });
     }
   }
 
@@ -96,16 +114,32 @@ class _PlayerScreenState extends State<PlayerScreen> {
     String player = _board[row][col];
 
     // Check Row
-    if (_board[row].every((cell) => cell == player)) return true;
+    if (_board[row].every((cell) => cell == player)) {
+      _winType = WinType.row;
+      _winIndex = row;
+      return true;
+    }
 
     // Check Column
-    if (_board.every((r) => r[col] == player)) return true;
+    if (_board.every((r) => r[col] == player)) {
+      _winType = WinType.column;
+      _winIndex = col;
+      return true;
+    }
 
     // Check Main Diagonal (top-left to bottom-right)
-    if (row == col && List.generate(3, (i) => _board[i][i]).every((cell) => cell == player)) return true;
+    if (row == col && List.generate(3, (i) => _board[i][i]).every((cell) => cell == player)) {
+      _winType = WinType.diagonalMain;
+      _winIndex = 0;
+      return true;
+    }
 
     // Check Anti-Diagonal (top-right to bottom-left)
-    if (row + col == 2 && List.generate(3, (i) => _board[i][2 - i]).every((cell) => cell == player)) return true;
+    if (row + col == 2 && List.generate(3, (i) => _board[i][2 - i]).every((cell) => cell == player)) {
+      _winType = WinType.diagonalAnti;
+      _winIndex = 2;
+      return true;
+    }
 
     return false;
   }
@@ -222,37 +256,57 @@ class _PlayerScreenState extends State<PlayerScreen> {
     // Calculate cell size: (Total Size - Total Line Width) / Number of Cells
     const double cellSize = (boardSize - (2 * lineThickness)) / 3; // (330 - 6) / 3 = 108.0
 
-    return Container(
+    return SizedBox(
       width: boardSize,
       height: boardSize,
-      decoration: BoxDecoration(
-        color: _currentCardColor,
-        borderRadius: BorderRadius.circular(12),
-        // Applying a subtle shadow for depth
-        boxShadow: [
-          BoxShadow(
-            color: _currentBoardLineColor.withAlpha(77),
-            blurRadius: 10,
-            spreadRadius: 2,
+      child: Stack(
+        children: [
+          Container(
+          width: boardSize,
+          height: boardSize,
+          decoration: BoxDecoration(
+            color: _currentCardColor,
+            borderRadius: BorderRadius.circular(12),
+            // Applying a subtle shadow for depth
+            boxShadow: [
+              BoxShadow(
+                color: _currentBoardLineColor.withAlpha(77),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Table(
-        // IMPORTANT: Use symmetric to draw ONLY INNER lines, removing the outside box border
-        border: TableBorder.symmetric(
-          inside: BorderSide(
-            width: lineThickness,
-            color: _currentBoardLineColor,
-          ),
-        ),
-        children: List.generate(3, (row) {
-          return TableRow(
-            children: List.generate(3, (col) {
-              // Now passing the calculated cellSize
-              return _buildCell(row, col, cellSize);
+          child: Table(
+            border: TableBorder.symmetric(
+              inside: BorderSide(
+                width: lineThickness,
+                color: _currentBoardLineColor,
+              ),
+            ),
+            children: List.generate(3, (row) {
+              return TableRow(
+                children: List.generate(3, (col) {
+                  // Now passing the calculated cellSize
+                  return _buildCell(row, col, cellSize);
+                }),
+              );
             }),
-          );
-        }),
+          ),
+          ),
+
+          // Winning line overlay
+          if (_winType != null)
+            CustomPaint(
+              size: const Size(boardSize, boardSize),
+              painter: WinningLinePainter(
+                winType: _winType!,
+                index: _winIndex,
+                color: _currentPlayer == 'X'
+                    ? _kPlayerXColor
+                    : _kPlayerOColor,
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -360,4 +414,54 @@ class _PlayerScreenState extends State<PlayerScreen> {
       ),
     );
   }
+}
+
+class WinningLinePainter extends CustomPainter {
+  final WinType winType;
+  final int index;
+  final Color color;
+
+  WinningLinePainter({
+    required this.winType,
+    required this.index,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round;
+
+    final cell = size.width / 3;
+    Offset start, end;
+
+    switch (winType) {
+      case WinType.row:
+        start = Offset(0, cell * index + cell / 2);
+        end = Offset(size.width, cell * index + cell / 2);
+        break;
+
+      case WinType.column:
+        start = Offset(cell * index + cell / 2, 0);
+        end = Offset(cell * index + cell / 2, size.height);
+        break;
+
+      case WinType.diagonalMain:
+        start = const Offset(0, 0);
+        end = Offset(size.width, size.height);
+        break;
+
+      case WinType.diagonalAnti:
+        start = Offset(size.width, 0);
+        end = Offset(0, size.height);
+        break;
+    }
+
+    canvas.drawLine(start, end, paint);
+  }
+
+  @override
+  bool shouldRepaint(_) => true;
 }
