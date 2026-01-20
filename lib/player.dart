@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../settings.dart';
 
-// --- THEME PALETTES (Copied for self-containment) ---
 // Dark Theme Colors
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
 const Color _kDarkBackgroundColor = Color(0xFF0F172A);
@@ -15,12 +14,10 @@ const Color _kLightBackgroundColor = Color(0xFFF0F4F8);
 const Color _kLightCardColor = Colors.white;
 const Color _kLightTextColor = Color(0xFF1E293B);
 
-// Player Colors (Constant for contrast regardless of theme)
-const Color _kPlayerXColor = Color(0xFFBF9F19); // Gold
-const Color _kPlayerOColor = Color(0xFF1C89E3); // Bright Blue
+const Color _kPlayerXColor = Color(0xFFBF9F19);
+const Color _kPlayerOColor = Color(0xFF1C89E3);
 
 enum WinType { row, column, diagonalMain, diagonalAnti, }
-
 
 class PlayerScreen extends StatefulWidget {
   final bool isDarkTheme;
@@ -31,16 +28,17 @@ class PlayerScreen extends StatefulWidget {
   State<PlayerScreen> createState() => _PlayerScreenState();
 }
 
-class _PlayerScreenState extends State<PlayerScreen> {
+class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderStateMixin {
   // Game State
   List<List<String>> _board = List.generate(3, (_) => List.filled(3, ''));
   String _currentPlayer = 'X';
   bool _gameFinished = false;
   String _message = 'Player X Turn';
+  late AnimationController _lineController;
+  late Animation<double> _lineAnimation;
 
   WinType? _winType;
   int _winIndex = -1;
-
 
   // Score
   int _playerXScore = 0;
@@ -50,6 +48,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   void initState() {
     super.initState();
+
+    _lineController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300)
+    );
+
+    _lineAnimation = CurvedAnimation(
+        parent: _lineController,
+        curve: Curves.easeOutCubic
+    );
+
     _resetGame();
   }
 
@@ -68,6 +77,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       _message = 'Player X Turn';
       _winType = null;
       _winIndex = -1;
+      _lineController.reset();
     });
   }
 
@@ -80,6 +90,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         if (_checkWin(row, col)) {
           _gameFinished = true;
           _message = 'Player $_currentPlayer Wins!';
+          _lineController.forward(from: 0);
           if (_currentPlayer == 'X') {
             _playerXScore++;
           } else {
@@ -296,15 +307,21 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
           // Winning line overlay
           if (_winType != null)
-            CustomPaint(
-              size: const Size(boardSize, boardSize),
-              painter: WinningLinePainter(
-                winType: _winType!,
-                index: _winIndex,
-                color: _currentPlayer == 'X'
-                    ? _kPlayerXColor
-                    : _kPlayerOColor,
-              ),
+            AnimatedBuilder(
+              animation: _lineController,
+              builder: (context, child) {
+                return CustomPaint(
+                  size: const Size(boardSize, boardSize),
+                  painter: WinningLinePainter(
+                    winType: _winType!,
+                    index: _winIndex,
+                    color: _currentPlayer == 'X'
+                        ? _kPlayerXColor
+                        : _kPlayerOColor,
+                    progress: _lineAnimation.value,
+                  ),
+                );
+              },
             ),
         ],
       ),
@@ -312,13 +329,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   Widget _buildCell(int row, int col, double size) {
-    // The GestureDetector is critical here for registering taps
     return GestureDetector(
       onTap: () => _handleTap(row, col),
       child: Container(
-        width: size, // Use calculated size
-        height: size, // Use calculated size
-        // Cell background is transparent to let the _currentCardColor show through
+        width: size,
+        height: size,
         color: Colors.transparent,
         child: Center(
           child: Text(
@@ -420,48 +435,65 @@ class WinningLinePainter extends CustomPainter {
   final WinType winType;
   final int index;
   final Color color;
+  final double progress;
 
   WinningLinePainter({
     required this.winType,
     required this.index,
     required this.color,
+    required this.progress,
   });
 
   @override
+  @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 6
-      ..strokeCap = StrokeCap.round;
-
     final cell = size.width / 3;
+    final inset = size.width * 0.08;
+
     Offset start, end;
 
     switch (winType) {
       case WinType.row:
-        start = Offset(0, cell * index + cell / 2);
-        end = Offset(size.width, cell * index + cell / 2);
+        start = Offset(inset, cell * index + cell / 2);
+        end = Offset(size.width - inset, cell * index + cell / 2);
         break;
 
       case WinType.column:
-        start = Offset(cell * index + cell / 2, 0);
-        end = Offset(cell * index + cell / 2, size.height);
+        start = Offset(cell * index + cell / 2, inset);
+        end = Offset(cell * index + cell / 2, size.height - inset);
         break;
 
       case WinType.diagonalMain:
-        start = const Offset(0, 0);
-        end = Offset(size.width, size.height);
+        start = Offset(inset, inset);
+        end = Offset(size.width - inset, size.height - inset);
         break;
 
       case WinType.diagonalAnti:
-        start = Offset(size.width, 0);
-        end = Offset(0, size.height);
+        start = Offset(size.width - inset, inset);
+        end = Offset(inset, size.height - inset);
         break;
     }
 
-    canvas.drawLine(start, end, paint);
+    final animatedEnd = Offset.lerp(start, end, progress)!;
+
+    final glowPaint = Paint()
+      ..color = color.withAlpha(90)
+      ..strokeWidth = 14
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+
+    final linePaint = Paint()
+      ..color = color
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    canvas.drawLine(start, animatedEnd, glowPaint);
+    canvas.drawLine(start, animatedEnd, linePaint);
   }
 
   @override
-  bool shouldRepaint(_) => true;
+  bool shouldRepaint(covariant WinningLinePainter old) =>
+      old.progress != progress;
 }

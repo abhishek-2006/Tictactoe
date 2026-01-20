@@ -4,7 +4,6 @@ import 'computer.dart';
 import 'player.dart';
 import 'settings.dart';
 
-// --- THEME PALETTES ---
 // Dark Theme Colors
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
 const Color _kDarkBackgroundColor = Color(0xFF0F172A);
@@ -18,7 +17,6 @@ const Color _kLightCardColor = Colors.white;
 const Color _kLightTextColor = Color(0xFF1E293B);
 
 class TicTacToeMenu extends StatefulWidget {
-  // NEW PROPS: Receive theme state and callback from ThemeWrapper
   final bool isDarkTheme;
   final Function(bool) onThemeChanged;
 
@@ -154,10 +152,11 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
     return Text(
       text,
       style: TextStyle(
-        fontFamily: 'Roboto',
+        fontFamily: 'Destacy',
         fontSize: 20,
         color: _currentAccentColor.withAlpha(204),
         fontWeight: FontWeight.w600,
+        letterSpacing: 1.4,
       ),
     );
   }
@@ -197,7 +196,6 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                       Switch(
                         value: widget.isDarkTheme,
                         onChanged: (value) {
-                          // MODIFIED: Use the callback to update ThemeWrapper/main.dart
                           widget.onThemeChanged(value);
                           if (_soundManager.isVibrationOn) {
                             HapticFeedback.selectionClick();
@@ -233,7 +231,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                 Text(
                   'Tic Tac Toe',
                   style: TextStyle(
-                    fontFamily: 'Destacy', // Assuming a bold, custom font
+                    fontFamily: 'Destacy',
                     fontSize: 64,
                     fontWeight: FontWeight.w900,
                     color: _currentAccentColor,
@@ -306,16 +304,16 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                   child: Column(
                     children: [
                       Text(
-                        'Designed By',
+                        'Made By',
                         style: TextStyle(
                           fontFamily: 'Roboto',
                           fontSize: 14,
-                          color: _currentSubtitleColor,
+                          color: _currentSubtitleColor.withAlpha(180),
                           fontWeight: FontWeight.w400,
-                          letterSpacing: 1.0,
+                          letterSpacing: 1.1,
                         ),
                       ),
-                      _buildBrandingText('ABHISHEK SHAH'),
+                      _buildBrandingText('Abhishek Shah'),
                     ],
                   ),
                 ),

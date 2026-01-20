@@ -210,45 +210,41 @@ class ComputerScreenState extends State<ComputerScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // EASY MODE (40% Minimax)
                     _buildInteractiveCard(
                       text: 'EASY',
                       color: _kEasyColor,
                       screen: EasyMode(
                         isDarkTheme: widget.isDarkTheme,
-                        onThemeChanged: widget.onThemeChanged, // PASS CALLBACK
+                        onThemeChanged: widget.onThemeChanged,
                       ),
                       icon: Icons.grass,
                     ),
-                    // MEDIUM MODE (60% Minimax)
                     _buildInteractiveCard(
                       text: 'MEDIUM',
                       color: _kMediumColor,
                       screen: MediumMode(
                         isDarkTheme: widget.isDarkTheme,
-                        onThemeChanged: widget.onThemeChanged, // PASS CALLBACK
+                        onThemeChanged: widget.onThemeChanged,
                       ),
                       icon: Icons.bolt,
                     ),
-                    // HARD MODE (70% Minimax)
                     _buildInteractiveCard(
                       text: 'HARD',
                       color: _kHardColor,
                       screen: HardMode(
                         isDarkTheme: widget.isDarkTheme,
-                        onThemeChanged: widget.onThemeChanged, // PASS CALLBACK
+                        onThemeChanged: widget.onThemeChanged,
                       ),
                       icon: Icons.hardware,
                     ),
-                    // LEGEND MODE (100% Minimax)
                     _buildInteractiveCard(
                       text: 'LEGEND',
                       color: _kLegendColor,
                       screen: LegendMode(
                         isDarkTheme: widget.isDarkTheme,
-                        onThemeChanged: widget.onThemeChanged, // PASS CALLBACK
+                        onThemeChanged: widget.onThemeChanged,
                       ),
-                      icon: Icons.workspace_premium, // Crown/Premium Icon
+                      icon: Icons.workspace_premium,
                     ),
                     const SizedBox(height: 50),
                   ],

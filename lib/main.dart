@@ -159,21 +159,22 @@ class FlutterSplashScreen extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'Designed by',
+                  'Made by',
                   style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Roboto',
                     color: textColor,
-                    letterSpacing: 1.5,
+                    letterSpacing: 1.2,
                   ),
                 ),
                 const Text(
                   'Abhishek Shah',
                   style: TextStyle(
                     fontSize: 24,
-                    fontFamily: 'Roboto',
+                    fontFamily: 'Destacy',
                     color: Color(0xFF2C64A7),
                     fontWeight: FontWeight.w800,
+                    letterSpacing: 1.4,
                   ),
                 ),
               ],

@@ -3,7 +3,6 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// --- THEME PALETTES ---
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
 const Color _kDarkBackgroundColor = Color(0xFF0F172A);
 const Color _kDarkCardColor = Color(0xFF1E293B);
@@ -39,7 +38,6 @@ class SoundManager {
   bool get isMusicOn => _isMusicOn;
   bool get isVibrationOn => _isVibrationOn;
 
-  // NEW: Method to load settings from SharedPreferences
   Future<void> _initPreferences() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -51,7 +49,6 @@ class SoundManager {
     // Apply music state immediately (must be async)
     if (_isMusicOn) {
       await _musicPlayer.setReleaseMode(ReleaseMode.loop);
-      // NOTE: Ensure 'bg_music.mp3' is available in assets
       await _musicPlayer.play(AssetSource('bg_music.mp3'));
     }
   }
@@ -59,7 +56,7 @@ class SoundManager {
   Future<void> setMusicEnabled(bool isEnabled) async {
     _isMusicOn = isEnabled;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_kMusicKey, isEnabled); // SAVE STATE
+    await prefs.setBool(_kMusicKey, isEnabled);
 
     if (_isMusicOn) {
       await _musicPlayer.setReleaseMode(ReleaseMode.loop);
@@ -72,7 +69,7 @@ class SoundManager {
   Future<void> setSoundEnabled(bool isEnabled) async {
     _isSoundOn = isEnabled;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_kSoundKey, isEnabled); // SAVE STATE
+    await prefs.setBool(_kSoundKey, isEnabled);
 
     // Play a tap sound immediately if enabled to confirm setting change
     if (_isSoundOn) {
@@ -86,7 +83,7 @@ class SoundManager {
     await prefs.setBool(_kVibrationKey, isEnabled); // SAVE STATE
 
     if (_isVibrationOn) {
-      HapticFeedback.lightImpact(); // Provide instant feedback
+      HapticFeedback.mediumImpact();
     }
   }
 
@@ -101,7 +98,7 @@ class SoundManager {
 
 class Settings extends StatefulWidget {
   final bool isDarkTheme;
-  final Function(bool) onThemeChanged; // NEW: Callback to notify ThemeWrapper
+  final Function(bool) onThemeChanged;
   const Settings({super.key, required this.isDarkTheme, required this.onThemeChanged});
 
   @override
@@ -136,14 +133,13 @@ class _SettingsState extends State<Settings> {
     _isDarkTheme = widget.isDarkTheme;
   }
 
-  // NEW: Method to save and apply the theme
   void _setThemeEnabled(bool isDark) async {
     setState(() {
       _isDarkTheme = isDark;
     });
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isDarkTheme', isDark); // SAVE THEME STATE
-    widget.onThemeChanged(isDark); // Notify ThemeWrapper
+    widget.onThemeChanged(isDark);
   }
 
   @override
@@ -161,8 +157,6 @@ class _SettingsState extends State<Settings> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // FIX: Wrap settings content in a Card/Container using _currentCardColor
-            // This clears the remaining unused_element warnings.
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 10.0),
               padding: const EdgeInsets.all(16.0),
@@ -186,7 +180,6 @@ class _SettingsState extends State<Settings> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      // color is implicitly _currentTextColor via context
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -199,7 +192,7 @@ class _SettingsState extends State<Settings> {
                   ),
                   const Divider(),
 
-                  const SizedBox(height: 20), // Reduced spacing slightly
+                  const SizedBox(height: 20),
 
                   // --- AUDIO & HAPTICS ---
                   const Text(
@@ -207,7 +200,6 @@ class _SettingsState extends State<Settings> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      // color is implicitly _currentTextColor via context
                     ),
                   ),
                   const SizedBox(height: 10),
