@@ -12,8 +12,8 @@ const Color _kLightBackgroundColor = Color(0xFFF0F4F8);
 const Color _kLightCardColor = Colors.white;
 const Color _kLightTextColor = Color(0xFF1E293B);
 
-const Color _kPlayerXColor = Color(0xFFBF9F19); // Gold/Orange
-const Color _kPlayerOColor = Color(0xFF1C89E3); // Blue
+const Color _kPlayerXColor = Color(0xFFBF9F19);
+const Color _kPlayerOColor = Color(0xFF1C89E3);
 const Color _kEasyModeColor = Color(0xFF4CAF50);
 
 enum WinType { row, column, diagonalMain, diagonalAnti }
@@ -45,11 +45,13 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
   late Animation<double> _lineAnimation;
   final SoundManager _soundManager = SoundManager();
 
-  Color get _currentBackgroundColor => widget.isDarkTheme ? _kDarkBackgroundColor : _kLightBackgroundColor;
-  Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
-  Color get _currentAppBarTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withAlpha(128) : _kLightTextColor.withAlpha(128);
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _currentBackgroundColor => _isDark ? _kDarkBackgroundColor : _kLightBackgroundColor;
+  Color get _currentCardColor => _isDark ? _kDarkCardColor : _kLightCardColor;
+  Color get _currentAppBarTextColor => _isDark ? _kDarkTextColor : _kLightTextColor;
+  Color get _currentTextColor => _isDark ? _kDarkTextColor : _kLightTextColor;
+  Color get _currentBoardLineColor => _isDark ? _kDarkTextColor.withAlpha(128) : _kLightTextColor.withAlpha(128);
 
   @override
   void initState() {
@@ -207,7 +209,7 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: _currentCardColor,
         title: const Text('Game Over', textAlign: TextAlign.center, style: TextStyle(color: _kEasyModeColor, fontWeight: FontWeight.bold)),
         content: Text(message, textAlign: TextAlign.center, style: TextStyle(color: _currentTextColor, fontSize: 18)),
@@ -231,7 +233,7 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildScoreColumn(label: 'PLAYER (X)', score: _playerXScore, color: _kPlayerXColor),
-        _buildScoreColumn(label: 'DRAWS', score: _draws, color: widget.isDarkTheme ? Colors.cyan : Colors.blue),
+        _buildScoreColumn(label: 'DRAWS', score: _draws, color: _isDark ? Colors.cyan : Colors.blue),
         _buildScoreColumn(label: 'CPU (O)', score: _cpuOScore, color: _kPlayerOColor),
       ],
     );
@@ -257,7 +259,7 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
       height: boardSize,
       decoration: BoxDecoration(
         color: _currentCardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [BoxShadow(color: _currentBoardLineColor.withAlpha(77), blurRadius: 10, spreadRadius: 2)],
       ),
       child: Stack(
@@ -320,7 +322,7 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged))),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(isDarkTheme: _isDark, onThemeChanged: widget.onThemeChanged))),
           ),
         ],
       ),
@@ -344,7 +346,7 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
                   backgroundColor: _kEasyModeColor,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 4,
                 ),
               ),
@@ -363,7 +365,6 @@ class WinningLinePainter extends CustomPainter {
   final Color color;
   final double progress;
 
-  // Pre-define paints to avoid object creation in paint()
   final Paint _linePaint;
   final Paint _glowPaint;
 
@@ -386,7 +387,6 @@ class WinningLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (progress <= 0) return;
-
     final cell = size.width / 3;
     final inset = size.width * 0.08;
     Offset start, end;

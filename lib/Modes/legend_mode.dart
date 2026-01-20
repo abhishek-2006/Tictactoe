@@ -46,12 +46,14 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
   late Animation<double> _lineAnimation;
   final SoundManager _soundManager = SoundManager();
 
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
   // Dynamic Color Getters
-  Color get _currentBackgroundColor => widget.isDarkTheme ? _kDarkBackgroundColor : _kLightBackgroundColor;
-  Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
-  Color get _currentAppBarTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  Color get _currentBoardLineColor => widget.isDarkTheme ? _kDarkTextColor.withAlpha(128) : _kLightTextColor.withAlpha(128);
+  Color get _currentBackgroundColor => _isDark ? _kDarkBackgroundColor : _kLightBackgroundColor;
+  Color get _currentCardColor => _isDark ? _kDarkCardColor : _kLightCardColor;
+  Color get _currentAppBarTextColor => _isDark ? _kDarkTextColor : _kLightTextColor;
+  Color get _currentTextColor => _isDark ? _kDarkTextColor : _kLightTextColor;
+  Color get _currentBoardLineColor => _isDark ? _kDarkTextColor.withAlpha(128) : _kLightTextColor.withAlpha(128);
 
   @override
   void initState() {
@@ -273,7 +275,7 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildScoreColumn(label: 'PLAYER (X)', score: _playerXScore, color: _kPlayerXColor),
-        _buildScoreColumn(label: 'DRAWS', score: _draws, color: widget.isDarkTheme ? Colors.cyan : Colors.blue),
+        _buildScoreColumn(label: 'DRAWS', score: _draws, color: _isDark ? Colors.cyan : Colors.blue),
         _buildScoreColumn(label: 'CPU (O)', score: _cpuOScore, color: _kPlayerOColor),
       ],
     );
@@ -362,7 +364,7 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged,))),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(isDarkTheme: _isDark, onThemeChanged: widget.onThemeChanged,))),
           ),
         ],
       ),
