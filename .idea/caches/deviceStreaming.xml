@@ -1498,6 +1498,23 @@
             </list>
           </option>
           <option name="api" value="35" />
+          <option name="brand" value="Infinix" />
+          <option name="codename" value="transsion_lab_infinix-x6856" />
+          <option name="id" value="transsion_lab_infinix-x6856" />
+          <option name="labId" value="transsion" />
+          <option name="manufacturer" value="INFINIX" />
+          <option name="name" value="NOTE 50 Pro+" />
+          <option name="screenDensity" value="440" />
+          <option name="screenX" value="1080" />
+          <option name="screenY" value="2436" />
+        </PersistentDeviceSelectionData>
+        <PersistentDeviceSelectionData>
+          <option name="accessStatus">
+            <list>
+              <option value="EULA_NOT_ACCEPTED" />
+            </list>
+          </option>
+          <option name="api" value="35" />
           <option name="brand" value="TECNO" />
           <option name="codename" value="transsion_lab_tecno-km4" />
           <option name="id" value="transsion_lab_tecno-km4" />
