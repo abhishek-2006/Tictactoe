@@ -181,7 +181,7 @@ class HardModeState extends State<HardMode> with TickerProviderStateMixin {
           empty.add([r, c]);
         }
       }
-    };
+    }
     return empty[Random().nextInt(empty.length)];
   }
 

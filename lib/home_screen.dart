@@ -202,7 +202,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                           }
                           // Saving is handled by settings.dart
                         },
-                        activeColor: _kDarkAccentColor,
+                        activeThumbColor: _kDarkAccentColor,
                         inactiveThumbColor: _kLightAccentColor,
                       ),
                       const SizedBox(width: 8),
@@ -267,10 +267,10 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                           // VS COMPUTER
                           _buildMenuButton(
                             icon: Icons.computer,
-                            title: 'VS CPU',
+                            title: 'VS COMPUTER',
                             subtitle: 'Play against an intelligent computer opponent',
                             onTap: () {
-                              // MODIFIED: Pass theme state and callback
+                              // Pass theme state and callback
                               Navigator.push(context, MaterialPageRoute(builder: (_) => ComputerScreen(
                                 isDarkTheme: widget.isDarkTheme,
                                 onThemeChanged: widget.onThemeChanged,

@@ -194,15 +194,6 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
 
   // --- END AI LOGIC ---
 
-  bool _quickCheck(int row, int col) {
-    final p = _board[row][col];
-    if (_board[row][0] == p && _board[row][1] == p && _board[row][2] == p) return true;
-    if (_board[0][col] == p && _board[1][col] == p && _board[2][col] == p) return true;
-    if (row == col && _board[0][0] == p && _board[1][1] == p && _board[2][2] == p) return true;
-    if (row + col == 2 && _board[0][2] == p && _board[1][1] == p && _board[2][0] == p) return true;
-    return false;
-  }
-
   bool _checkWin(int row, int col) {
     final p = _board[row][col];
     _winningLineColor = (p == 'X') ? _kPlayerXColor : _kPlayerOColor;

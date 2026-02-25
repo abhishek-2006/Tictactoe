@@ -173,7 +173,7 @@ class MediumModeState extends State<MediumMode> with TickerProviderStateMixin {
           empty.add([r, c]);
         }
       }
-    };
+    }
     return empty[Random().nextInt(empty.length)];
   }
 

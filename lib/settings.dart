@@ -283,7 +283,7 @@ class _SettingsState extends State<Settings> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: _currentAccentColor,
+        activeThumbColor: _currentAccentColor,
         // Theming the track for better contrast
         trackOutlineColor: WidgetStateProperty.all(_currentAccentColor.withAlpha(128)),
         trackColor: WidgetStateProperty.resolveWith((states) {
