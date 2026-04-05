@@ -180,6 +180,19 @@ class ComputerScreenState extends State<ComputerScreen> {
                                 _buildCards(false),
                               ]),
                             )
+                          else if (isTablet)
+                              SliverPadding(
+                                padding: const EdgeInsets.all(32),
+                                sliver: SliverGrid(
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: isDesktop ? 2 : 2,
+                                    childAspectRatio: 1.5,
+                                    mainAxisSpacing: 40,
+                                    crossAxisSpacing: 40,
+                                  ),
+                                  delegate: SliverChildListDelegate(_buildGridCards(true)),
+                                ),
+                              )
                           else
                             SliverPadding(
                               padding: const EdgeInsets.all(80.0),
