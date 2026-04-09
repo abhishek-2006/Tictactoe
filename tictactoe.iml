@@ -33,6 +33,10 @@
       <excludeFolder url="file://$MODULE_DIR$/windows/flutter/ephemeral/.plugin_symlinks/jni/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/windows/flutter/ephemeral/.plugin_symlinks/jni/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/windows/flutter/ephemeral/.plugin_symlinks/jni/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ios/Flutter/ephemeral" />
+      <excludeFolder url="file://$MODULE_DIR$/macos/Flutter/ephemeral" />
+      <excludeFolder url="file://$MODULE_DIR$/windows/flutter/ephemeral" />
+      <excludeFolder url="file://$MODULE_DIR$/windows/out/build" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Dart SDK" level="project" />
