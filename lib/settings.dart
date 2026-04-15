@@ -108,25 +108,20 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   final SoundManager _soundManager = SoundManager();
 
-  // Local state to track toggle values
   late bool _isSoundOn;
   late bool _isMusicOn;
   late bool _isVibrationOn;
   late bool _isDarkTheme;
 
-  // Dynamic Color Getters
   Color get _currentAccentColor => widget.isDarkTheme ? _kDarkAccentColor : _kLightAccentColor;
   Color get _currentBackgroundColor => widget.isDarkTheme ? _kDarkBackgroundColor : _kLightBackgroundColor;
   Color get _currentAppBarTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
-  // FIX: Added _currentCardColor getter to clear warnings for _kDarkCardColor and _kLightCardColor
   Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
-
 
   @override
   void initState() {
     super.initState();
-    // Initialize local states from SoundManager singleton and widget props
     _isSoundOn = _soundManager.isSoundOn;
     _isMusicOn = _soundManager.isMusicOn;
     _isVibrationOn = _soundManager.isVibrationOn;
@@ -138,8 +133,56 @@ class _SettingsState extends State<Settings> {
       _isDarkTheme = isDark;
     });
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkTheme', isDark); // SAVE THEME STATE
+    await prefs.setBool('isDarkTheme', isDark);
     widget.onThemeChanged(isDark);
+  }
+
+  // --- NEW: Helper to group audio toggles and fix "unused field" warnings ---
+  List<Widget> _audioToggles() {
+    return [
+      _buildToggleTile(
+        'Sound Effects',
+        Icons.volume_up,
+        _isSoundOn,
+            (value) {
+          setState(() => _isSoundOn = value);
+          _soundManager.setSoundEnabled(value);
+        },
+      ),
+      _buildToggleTile(
+        'Background Music',
+        Icons.music_note,
+        _isMusicOn,
+            (value) {
+          setState(() => _isMusicOn = value);
+          _soundManager.setMusicEnabled(value);
+        },
+      ),
+      _buildToggleTile(
+        'Haptic Feedback',
+        Icons.vibration,
+        _isVibrationOn,
+            (value) {
+          setState(() => _isVibrationOn = value);
+          _soundManager.setVibrationEnabled(value);
+        },
+      ),
+    ];
+  }
+
+  Widget _buildHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w900,
+          color: _currentAccentColor,
+          letterSpacing: 1.1,
+        ),
+      ),
+    );
   }
 
   @override
@@ -147,124 +190,78 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       backgroundColor: _currentBackgroundColor,
       appBar: AppBar(
-        title: Text('Settings', style: TextStyle(color: _currentAppBarTextColor, fontWeight: FontWeight.bold)),
+        title: Text('Settings',
+            style: TextStyle(color: _currentAppBarTextColor, fontWeight: FontWeight.bold)
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
         iconTheme: IconThemeData(color: _currentAppBarTextColor),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10.0),
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: _currentCardColor,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: _currentTextColor.withAlpha(25), // Subtle shadow
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+      body: LayoutBuilder(
+          builder: (context, constraints) {
+            bool isLargeScreen = constraints.maxWidth >= 800;
+
+            return Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isLargeScreen ? 40.0 : 12.0,
+                  vertical: 20.0,
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: Container(
+                    padding: const EdgeInsets.all(24.0),
+                    decoration: BoxDecoration(
+                      color: _currentCardColor,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withAlpha(20),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildHeader('Appearance'),
+                        _buildToggleTile(
+                            'Dark Theme',
+                            Icons.dark_mode,
+                            _isDarkTheme,
+                                (value) => _setThemeEnabled(value)
+                        ),
+                        const SizedBox(height: 30),
+                        _buildHeader('Audio & Haptics'),
+                        isLargeScreen
+                            ? GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          childAspectRatio: 4,
+                          crossAxisSpacing: 20,
+                          children: _audioToggles(),
+                        )
+                            : Column(children: _audioToggles()),
+                        const SizedBox(height: 30),
+                        _buildHeader('About Game'),
+                        Text(
+                          'Tic-Tac-Toe is the classic game of Xs and Os against a friend or four unique CPU difficulties, including the unbeatable AI.',
+                          style: TextStyle(
+                            fontSize: 16,
+                            height: 1.5,
+                            color: _currentTextColor.withAlpha(179),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // --- APPEARANCE ---
-                  const Text(
-                    'Appearance',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildToggleTile(
-                      'Dark Theme',
-                      Icons.dark_mode,
-                      _isDarkTheme,
-                      // Use the new save/notify function
-                          (value) => _setThemeEnabled(value)
-                  ),
-                  const Divider(),
-
-                  const SizedBox(height: 20),
-
-                  // --- AUDIO & HAPTICS ---
-                  const Text(
-                    'Audio & Haptics',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Sound Toggle
-                  _buildToggleTile(
-                    'Sound Effects',
-                    Icons.volume_up,
-                    _isSoundOn,
-                        (value) {
-                      setState(() => _isSoundOn = value);
-                      _soundManager.setSoundEnabled(value);
-                    },
-                  ),
-                  const Divider(),
-
-                  // Music Toggle
-                  _buildToggleTile(
-                    'Background Music',
-                    Icons.music_note,
-                    _isMusicOn,
-                        (value) {
-                      setState(() => _isMusicOn = value);
-                      _soundManager.setMusicEnabled(value);
-                    },
-                  ),
-                  const Divider(),
-
-                  // Vibration Toggle
-                  _buildToggleTile(
-                    'Haptic Feedback',
-                    Icons.vibration,
-                    _isVibrationOn,
-                        (value) {
-                      setState(() => _isVibrationOn = value);
-                      _soundManager.setVibrationEnabled(value);
-                    },
-                  ),
-                  const Divider(),
-
-                  const SizedBox(height: 20),
-
-                  // --- ABOUT GAME ---
-                  const Text(
-                    'About Game',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // About Text Content
-                  Text(
-                    'Tic-Tac-Toe is the classic game of Xs and Os against a friend or four unique CPU difficulties, including the unbeatable Legend AI.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: _currentTextColor.withAlpha(179), // 0.7 opacity
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+            );
+          }
       ),
     );
   }
@@ -284,7 +281,6 @@ class _SettingsState extends State<Settings> {
         value: value,
         onChanged: onChanged,
         activeThumbColor: _currentAccentColor,
-        // Theming the track for better contrast
         trackOutlineColor: WidgetStateProperty.all(_currentAccentColor.withAlpha(128)),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {

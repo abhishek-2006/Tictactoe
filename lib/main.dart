@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tictactoe/update_service.dart';
 import 'home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -41,7 +42,7 @@ class _ThemeWrapperState extends State<ThemeWrapper> {
   @override
   void initState() {
     super.initState();
-    _loadThemePreference(); // Load theme on init
+    _loadThemePreference();
   }
 
   // Load theme preference from SharedPreferences
@@ -114,7 +115,11 @@ class SplashDeciderState extends State<SplashDecider> {
   @override
   void initState() {
     super.initState();
-    // The core logic: Wait 3 seconds, then switch to the main menu
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.check(context);
+    });
+
     Timer(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
@@ -127,7 +132,6 @@ class SplashDeciderState extends State<SplashDecider> {
   @override
   Widget build(BuildContext context) {
     if (_showSplash) {
-      // Show the custom Flutter splash screen
       return FlutterSplashScreen(isDarkTheme: widget.isDarkTheme);
     } else {
       // Transition to the main menu (home_screen.dart)

@@ -9,6 +9,8 @@ build/
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
 release.bat
+lib/firebase_options.dart
+android/app/google-services.json
 # Directory created by dartdoc
 # If you don't generate documentation locally you can remove this line.
 doc/api/
