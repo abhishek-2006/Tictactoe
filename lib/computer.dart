@@ -6,7 +6,6 @@ import 'Modes/legend_mode.dart';
 import 'Modes/medium_mode.dart';
 import 'settings.dart';
 
-// --- THEME PALETTES ---
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
 const Color _kDarkBackgroundColor = Color(0xFF0F172A);
 const Color _kDarkCardColor = Color(0xFF1E293B);
@@ -70,7 +69,7 @@ class ComputerScreenState extends State<ComputerScreen> {
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: isGridMode
-                ? Column( // Vertical layout inside the card for Grid
+                ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon, size: 40, color: color.withAlpha(204)),
@@ -80,7 +79,7 @@ class ComputerScreenState extends State<ComputerScreen> {
                 Text(_getModeDescription(text), textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: _currentTextColor.withAlpha(179))),
               ],
             )
-                : Row( // Horizontal layout for List/Column
+                : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
