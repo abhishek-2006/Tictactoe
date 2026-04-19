@@ -4,18 +4,27 @@ A modern, cross-platform **Tic Tac Toe** game built using **Flutter**. Play agai
 
 ## 🚀 Features
 
-- 🎮 Play against **Computer** (Easy, Medium, Hard, Legend)
-- 👬 Play with **Friend (1v1)**
-- ✨ **Real-Time Theme Synchronization** (Dark/Light mode updates instantly)
-- 💾 **Persistent Theme Preference** (Saves theme locally using `shared_preferences`)
-- 🧠 Smart AI logic
-- 📱 Responsive for mobile (Android/iOS)
-- 🎨 Beautiful UI
-- 📳 **Haptic Feedback**
-- 💥 **State Management** using **Provider**
-- 🌈 Custom splash screen
+* 🎮 Play against **Computer**
 
-## To watch images please click me
+  * Easy 🟢
+  * Medium 🟡
+  * Hard 🔴
+  * Legend 🧠
+* 👬 Play with **Friend (1v1)**
+* ✨ **Real-Time Theme Sync** (Dark/Light mode)
+* 🧠 Smart AI logic
+* 📱 Responsive for mobile (Android/iOS)
+* 🎨 Beautiful UI
+* 📳 **Haptic Feedback**
+* 💥 **State Management** using **Provider**
+* 🌈 Custom splash screen
+
+## 🛠️ Tech Stack
+
+* **Flutter**
+* **Dart**
+* **Provider (State Management)**
+* **Shared Preferences**
 
 ## ➤ Prerequisites:
 - [Flutter SDK](https://flutter.dev/docs/get-started/install)
@@ -23,17 +32,17 @@ A modern, cross-platform **Tic Tac Toe** game built using **Flutter**. Play agai
 
 ## 📦 Installation
 
-1. Clone this repository to your local machine:
+1. Clone this repository:
    ```bash
    git clone https://github.com/abhishek-2006/Tictactoe.git
    ```
 
-2. Move to project directory
+2. Navigate to project directory
    ```bash
    cd Tictactoe
    ```
 
-3. Get Dependencies
+3. Install Dependencies
    ```bash
    flutter pub get
    ```
