@@ -3,6 +3,8 @@
 tictactoe.iss
 
 # Files and directories created by pub
+.idea
+.vs
 .dart_tool/
 .packages
 build/

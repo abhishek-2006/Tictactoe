@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'computer.dart';
@@ -38,7 +39,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
-    )..repeat(reverse: true); // Loop the animation
+    )..repeat(reverse: true);
   }
 
   @override
@@ -47,7 +48,6 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
     super.dispose();
   }
 
-  // Dynamic Color Getters now use widget.isDarkTheme
   Color get _currentAccentColor => widget.isDarkTheme ? _kDarkAccentColor : _kLightAccentColor;
   Color get _currentCardColor => widget.isDarkTheme ? _kDarkCardColor : _kLightCardColor;
   Color get _currentTextColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
@@ -270,7 +270,10 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                             title: 'VS COMPUTER',
                             subtitle: 'Play against an intelligent computer opponent',
                             onTap: () {
-                              // Pass theme state and callback
+                              FirebaseAnalytics.instance.logEvent(
+                                name: "select_mode",
+                                parameters: {"mode": "ai"},
+                              );
                               Navigator.push(context, MaterialPageRoute(builder: (_) => ComputerScreen(
                                 isDarkTheme: widget.isDarkTheme,
                                 onThemeChanged: widget.onThemeChanged,
@@ -284,7 +287,10 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                             title: 'VS FRIEND',
                             subtitle: 'Local two-player mode on a single device',
                             onTap: () {
-                              // MODIFIED: Pass theme state and callback
+                              FirebaseAnalytics.instance.logEvent(
+                                name: "select_mode",
+                                parameters: {"mode": "pvp"},
+                              );
                               Navigator.push(context, MaterialPageRoute(builder: (_) => PlayerScreen(
                                 isDarkTheme: widget.isDarkTheme,
                                 onThemeChanged: widget.onThemeChanged,

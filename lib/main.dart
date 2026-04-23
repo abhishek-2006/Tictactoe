@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tictactoe/update_service.dart';
 import 'home_screen.dart';
@@ -13,10 +12,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const TicTacToeApp());
-}
-
-void enterScreenshotMode() {
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 }
 
 class TicTacToeApp extends StatelessWidget {
