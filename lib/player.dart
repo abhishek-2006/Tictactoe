@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../settings.dart';
+import 'animated_widgets.dart';
 
 // Dark Theme Colors
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
@@ -336,13 +337,10 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
         height: size,
         color: Colors.transparent,
         child: Center(
-          child: Text(
-            _board[row][col],
-            style: TextStyle(
-              fontSize: 55,
-              fontWeight: FontWeight.w800,
-              color: _board[row][col] == 'X' ? _kPlayerXColor : _kPlayerOColor,
-            ),
+          child: AnimatedMark(
+            mark: _board[row][col],
+            playerXColor: _kPlayerXColor,
+            playerOColor: _kPlayerOColor,
           ),
         ),
       ),
@@ -372,7 +370,7 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
               HapticFeedback.lightImpact();
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Settings(
+                AdvancedPageTransition(page: Settings(
                   isDarkTheme: widget.isDarkTheme,
                   onThemeChanged: widget.onThemeChanged,
                 )),
@@ -387,41 +385,50 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
 
-              _buildScoreboard(),
+              StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildScoreboard()),
 
               const SizedBox(height: 60.0),
 
-              Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
-                child: Text(
-                  _message,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: _message.contains('X Turn') ? _kPlayerXColor : _message.contains('O Turn') ? _kPlayerOColor : _currentTextColor,
+              StaggeredEntrance(
+                delay: const Duration(milliseconds: 200),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 30.0),
+                  child: PulsingText(
+                    text: _message,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: _message.contains('X Turn') ? _kPlayerXColor : _message.contains('O Turn') ? _kPlayerOColor : _currentTextColor,
+                    ),
                   ),
                 ),
               ),
 
-              _buildBoard(),
+              StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildBoard()),
 
-              Padding(
-                padding: const EdgeInsets.only(top: 40.0, bottom: 40.0),
-                child: ElevatedButton.icon(
-                  onPressed: () {
+              StaggeredEntrance(
+                delay: const Duration(milliseconds: 400),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 40.0, bottom: 40.0),
+                  child: ElasticBouncingWidget(
+                    onTap: () {
                     HapticFeedback.lightImpact();
                     _resetGame();
                   },
-                  icon: const Icon(Icons.refresh, size: 28),
-                  label: const Text('New Game', style: TextStyle(fontSize: 20)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _currentAccentColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    elevation: 5,
+                  child: ElevatedButton.icon(
+                    onPressed: () {}, // Handled by BouncingWidget
+                    icon: const Icon(Icons.refresh, size: 28),
+                    label: const Text('New Game', style: TextStyle(fontSize: 20)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _currentAccentColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      elevation: 5,
+                    ),
                   ),
                 ),
+              ),
               ),
             ],
           ),

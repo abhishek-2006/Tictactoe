@@ -5,6 +5,7 @@ import 'Modes/hard_mode.dart';
 import 'Modes/legend_mode.dart';
 import 'Modes/medium_mode.dart';
 import 'settings.dart';
+import 'animated_widgets.dart';
 
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
 const Color _kDarkBackgroundColor = Color(0xFF0F172A);
@@ -51,11 +52,11 @@ class ComputerScreenState extends State<ComputerScreen> {
           horizontal: isGridMode ? 8.0 : 24.0,
           vertical: isGridMode ? 8.0 : 12.0
       ),
-      child: GestureDetector(
+      child: ElasticBouncingWidget(
         onTap: () {
           if (_soundManager.isVibrationOn) HapticFeedback.mediumImpact();
           if (_soundManager.isSoundOn) _soundManager.playTapSound();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+          Navigator.push(context, AdvancedPageTransition(page: screen));
         },
         child: Container(
           decoration: BoxDecoration(
@@ -155,10 +156,13 @@ class ComputerScreenState extends State<ComputerScreen> {
                       icon: Icon(Icons.settings, color: _currentAccentColor),
                       onPressed: () => Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => Settings(
-                                  isDarkTheme: widget.isDarkTheme,
-                                  onThemeChanged: widget.onThemeChanged))),
+                          AdvancedPageTransition(
+                              page: Settings(
+                            isDarkTheme: widget.isDarkTheme,
+                            onThemeChanged: widget.onThemeChanged
+                          )
+                        )
+                      ),
                     ),
                   ],
                 ),
@@ -228,10 +232,10 @@ class ComputerScreenState extends State<ComputerScreen> {
   // Common list of cards
   List<Widget> _buildGridCards(bool isGrid) {
     return [
-      _buildInteractiveCard(text: 'EASY', color: _kEasyColor, icon: Icons.grass, screen: EasyMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid),
-      _buildInteractiveCard(text: 'MEDIUM', color: _kMediumColor, icon: Icons.bolt, screen: MediumMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid),
-      _buildInteractiveCard(text: 'HARD', color: _kHardColor, icon: Icons.hardware, screen: HardMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid),
-      _buildInteractiveCard(text: 'LEGEND', color: _kLegendColor, icon: Icons.workspace_premium, screen: LegendMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid),
+      StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildInteractiveCard(text: 'EASY', color: _kEasyColor, icon: Icons.grass, screen: EasyMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid)),
+      StaggeredEntrance(delay: const Duration(milliseconds: 200), child: _buildInteractiveCard(text: 'MEDIUM', color: _kMediumColor, icon: Icons.bolt, screen: MediumMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid)),
+      StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildInteractiveCard(text: 'HARD', color: _kHardColor, icon: Icons.hardware, screen: HardMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid)),
+      StaggeredEntrance(delay: const Duration(milliseconds: 400), child: _buildInteractiveCard(text: 'LEGEND', color: _kLegendColor, icon: Icons.workspace_premium, screen: LegendMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid)),
     ];
   }
 }

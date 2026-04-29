@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:math';
 import '../settings.dart';
+import '../animated_widgets.dart';
 
 const Color _kDarkBackgroundColor = Color(0xFF0F172A);
 const Color _kDarkCardColor = Color(0xFF1E293B);
@@ -296,13 +297,10 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
         height: size,
         color: Colors.transparent,
         child: Center(
-          child: Text(
-            _board[row][col],
-            style: TextStyle(
-              fontSize: 55,
-              fontWeight: FontWeight.w800,
-              color: _board[row][col] == 'X' ? _kPlayerXColor : _kPlayerOColor,
-            ),
+          child: AnimatedMark(
+            mark: _board[row][col],
+            playerXColor: _kPlayerXColor,
+            playerOColor: _kPlayerOColor,
           ),
         ),
       ),
@@ -322,7 +320,7 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(isDarkTheme: _isDark, onThemeChanged: widget.onThemeChanged))),
+            onPressed: () => Navigator.push(context, AdvancedPageTransition(page: Settings(isDarkTheme: _isDark, onThemeChanged: widget.onThemeChanged))),
           ),
         ],
       ),
@@ -332,23 +330,39 @@ class EasyModeState extends State<EasyMode> with TickerProviderStateMixin {
           child: Column(
             children: [
               const SizedBox(height: 40.0),
-              _buildScoreboard(),
+              StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildScoreboard()),
               const SizedBox(height: 40.0),
-              Text(_message, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: _message.startsWith('Player X') ? _kPlayerXColor : _message.startsWith('CPU') ? _kPlayerOColor : _currentTextColor)),
-              const SizedBox(height: 30.0),
-              _buildBoard(),
-              const SizedBox(height: 40.0),
-              ElevatedButton.icon(
-                onPressed: _resetGame,
-                icon: const Icon(Icons.refresh),
-                label: const Text('New Game', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _kEasyModeColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 4,
+              StaggeredEntrance(
+                delay: const Duration(milliseconds: 200),
+                child: PulsingText(
+                  text: _message,
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: _message.startsWith('Player X') ? _kPlayerXColor : _message.startsWith('CPU') ? _kPlayerOColor : _currentTextColor)
                 ),
+              ),
+              const SizedBox(height: 30.0),
+              StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildBoard()),
+              const SizedBox(height: 40.0),
+              StaggeredEntrance(
+                delay: const Duration(milliseconds: 400),
+                child: ElasticBouncingWidget(
+                onTap: _resetGame,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  decoration: BoxDecoration(
+                    color: _kEasyModeColor,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.refresh, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('New Game', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                    ],
+                  ),
+                ),
+              ),
               ),
               const SizedBox(height: 40.0),
             ],

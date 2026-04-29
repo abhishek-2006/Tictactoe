@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'computer.dart';
 import 'player.dart';
 import 'settings.dart';
+import 'animated_widgets.dart';
 
 // Dark Theme Colors
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
@@ -65,7 +66,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: GestureDetector(
+      child: ElasticBouncingWidget(
         onTap: () {
           if (_soundManager.isSoundOn) {
             _soundManager.playTapSound();
@@ -215,7 +216,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                           }
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => Settings(
+                            AdvancedPageTransition(page: Settings(
                               isDarkTheme: widget.isDarkTheme,
                               onThemeChanged: widget.onThemeChanged, // PASS CALLBACK
                             )),
@@ -228,37 +229,46 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                 ),
 
                 // 2. Title
-                Text(
-                  'Tic Tac Toe',
-                  style: TextStyle(
-                    fontFamily: 'Destacy',
-                    fontSize: 64,
-                    fontWeight: FontWeight.w900,
-                    color: _currentAccentColor,
-                    letterSpacing: 3.0,
-                    shadows: [
-                      BoxShadow(
-                        color: _currentAccentColor.withAlpha(102),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                StaggeredEntrance(
+                  delay: const Duration(milliseconds: 100),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Tic Tac Toe',
+                        style: TextStyle(
+                          fontFamily: 'Destacy',
+                          fontSize: 64,
+                          fontWeight: FontWeight.w900,
+                          color: _currentAccentColor,
+                          letterSpacing: 3.0,
+                          shadows: [
+                            BoxShadow(
+                              color: _currentAccentColor.withAlpha(102),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        'Ultimate Edition',
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 18,
+                          color: _currentSubtitleColor,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 2.0,
+                        ),
                       ),
                     ],
-                  ),
-                ),
-                Text(
-                  'Ultimate Edition',
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 18,
-                    color: _currentSubtitleColor,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 2.0,
                   ),
                 ),
 
                 // 3. Menu Buttons
                 Expanded(
-                  child: Center(
+                  child: StaggeredEntrance(
+                    delay: const Duration(milliseconds: 200),
+                    child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 400),
                       child: Column(
@@ -274,7 +284,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                                 name: "select_mode",
                                 parameters: {"mode": "ai"},
                               );
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => ComputerScreen(
+                              Navigator.push(context, AdvancedPageTransition(page: ComputerScreen(
                                 isDarkTheme: widget.isDarkTheme,
                                 onThemeChanged: widget.onThemeChanged,
                               )));
@@ -291,7 +301,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                                 name: "select_mode",
                                 parameters: {"mode": "pvp"},
                               );
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => PlayerScreen(
+                              Navigator.push(context, AdvancedPageTransition(page: PlayerScreen(
                                 isDarkTheme: widget.isDarkTheme,
                                 onThemeChanged: widget.onThemeChanged,
                               )));
@@ -303,10 +313,13 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                     ),
                   ),
                 ),
+                ),
 
                 // 4. Footer Branding
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0, top: 20.0),
+                StaggeredEntrance(
+                  delay: const Duration(milliseconds: 300),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0, top: 120.0),
                   child: Column(
                     children: [
                       Text(
@@ -322,6 +335,7 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
                       _buildBrandingText('Abhishek Shah'),
                     ],
                   ),
+                ),
                 ),
               ],
             ),
