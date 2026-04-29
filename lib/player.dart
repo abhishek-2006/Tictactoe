@@ -96,7 +96,7 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
           } else {
             _playerOScore++;
           }
-          Future.delayed(const Duration(seconds: 2), () {
+          Future.delayed(const Duration(seconds: 1), () {
             if (!mounted) return;
             _showFinishDialog(_message, _currentPlayer);
           });
@@ -104,7 +104,7 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
           _gameFinished = true;
           _message = 'It\'s a Draw!';
           _draws++;
-          Future.delayed(const Duration(seconds: 2), () {
+          Future.delayed(const Duration(seconds: 1), () {
             if (!mounted) return;
             _showFinishDialog(_message, null);
           });
@@ -114,7 +114,7 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
         }
       });
     } else if (_gameFinished) {
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 1), () {
         if (!mounted) return;
         _showFinishDialog(_message, null);
       });

@@ -81,7 +81,7 @@ class HardModeState extends State<HardMode> with TickerProviderStateMixin {
           _message = 'Player X Wins!';
           _playerXScore++;
           _lineController.forward();
-          Future.delayed(const Duration(milliseconds: 600), () => _showFinishDialog(_message));
+          Future.delayed(const Duration(milliseconds: 400), () => _showFinishDialog(_message));
         } else if (_checkDraw()) {
           _gameFinished = true;
           _message = 'It\'s a Draw!';
@@ -127,7 +127,7 @@ class HardModeState extends State<HardMode> with TickerProviderStateMixin {
             _message = 'CPU Wins!';
             _cpuOScore++;
             _lineController.forward();
-            Future.delayed(const Duration(milliseconds: 600), () => _showFinishDialog(_message));
+            Future.delayed(const Duration(milliseconds: 400), () => _showFinishDialog(_message));
           } else if (_checkDraw()) {
             _gameFinished = true;
             _message = 'It\'s a Draw!';
