@@ -181,6 +181,11 @@ class AnimatedMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Responsive font sizing for small screens (e.g., 5.5 inch devices)
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360 || size.height < 600;
+    final double markFontSize = isSmallScreen ? 40 : 55;
+
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 600),
       switchInCurve: Curves.elasticOut,
@@ -199,7 +204,7 @@ class AnimatedMark extends StatelessWidget {
               mark,
               key: ValueKey<String>(mark),
               style: TextStyle(
-                fontSize: 55,
+                fontSize: markFontSize,
                 fontWeight: FontWeight.w800,
                 color: mark == 'X' ? playerXColor : playerOColor,
               ),

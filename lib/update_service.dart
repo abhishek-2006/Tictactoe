@@ -46,6 +46,10 @@ class UpdateService {
 
   static void _showDialog(BuildContext context, String ver, String url, String notes) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Responsive sizing for small screens (e.g., 5.5 inch devices)
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360 || size.height < 600;
 
     showDialog(
       context: context,
@@ -53,38 +57,50 @@ class UpdateService {
       builder: (context) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        titlePadding: EdgeInsets.all(isSmallScreen ? 16 : 24),
+        contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16 : 24, vertical: 8),
         title: Row(
           children: [
-            Image.asset('assets/splash.png', width: 32, height: 32),
-            const SizedBox(width: 12),
-            const Text("Update Found"),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Version $ver is now available.",
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            const Text("Release Notes:", style: TextStyle(fontSize: 12, color: Colors.blueAccent)),
-            const SizedBox(height: 4),
-            Flexible(
-              child: SingleChildScrollView(
-                child: Text(notes, style: const TextStyle(fontSize: 13)),
+            Image.asset('assets/splash.png', width: isSmallScreen ? 24 : 32, height: isSmallScreen ? 24 : 32),
+            SizedBox(width: isSmallScreen ? 8 : 12),
+            Expanded(
+              child: Text(
+                "Update Found",
+                style: TextStyle(fontSize: isSmallScreen ? 18 : 20),
               ),
             ),
           ],
         ),
+        content: SizedBox(
+          width: size.width * 0.85,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Version $ver is now available.",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)),
+              SizedBox(height: isSmallScreen ? 8 : 12),
+              Text("Release Notes:", style: TextStyle(fontSize: isSmallScreen ? 11 : 12, color: Colors.blueAccent)),
+              const SizedBox(height: 4),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Text(notes, style: TextStyle(fontSize: isSmallScreen ? 12 : 13)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actionsPadding: EdgeInsets.all(isSmallScreen ? 8 : 16),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Later", style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+            child: Text("Later", style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: isSmallScreen ? 12 : 14)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blueAccent,
               foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16, vertical: isSmallScreen ? 8 : 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () async {
@@ -93,7 +109,7 @@ class UpdateService {
                 await launchUrl(uri, mode: LaunchMode.externalApplication);
               }
             },
-            child: const Text("Download APK"),
+            child: Text("Download APK", style: TextStyle(fontSize: isSmallScreen ? 12 : 14)),
           ),
         ],
       ),

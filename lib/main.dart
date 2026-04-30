@@ -149,47 +149,53 @@ class FlutterSplashScreen extends StatelessWidget {
     final Color backgroundColor = isDarkTheme ? const Color(0xFF0F172A) : Colors.white;
     final Color textColor = isDarkTheme ? Colors.white70 : Colors.black87;
 
+    // Responsive sizing for small screens (e.g., 5.5 inch devices)
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360 || size.height < 600;
+
     return Scaffold(
       backgroundColor: backgroundColor,
-      body: Stack(
-        children: [
-          Center(
-            child: Image.asset(
-              "assets/splash.png",
-              height: 150,
-              width: 150,
-              fit: BoxFit.contain,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Center(
+              child: Image.asset(
+                "assets/splash.png",
+                height: isSmallScreen ? 100 : 150,
+                width: isSmallScreen ? 100 : 150,
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-          Positioned(
-            bottom: 40,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                Text(
-                  'Made by',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Roboto',
-                    color: textColor,
-                    letterSpacing: 1.2,
+            Positioned(
+              bottom: isSmallScreen ? 20 : 40,
+              left: 0,
+              right: 0,
+              child: Column(
+                children: [
+                  Text(
+                    'Made by',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 14 : 16,
+                      fontFamily: 'Roboto',
+                      color: textColor,
+                      letterSpacing: 1.2,
+                    ),
                   ),
-                ),
-                const Text(
-                  'Abhishek Shah',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontFamily: 'Destacy',
-                    color: Color(0xFF2C64A7),
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.4,
+                  Text(
+                    'Abhishek Shah',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 20 : 24,
+                      fontFamily: 'Destacy',
+                      color: const Color(0xFF2C64A7),
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.4,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
