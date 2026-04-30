@@ -57,93 +57,78 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
   Color get _currentSettingsIconColor => widget.isDarkTheme ? _kDarkTextColor : _kLightTextColor;
 
 
-  Widget _buildMenuButton({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    required double maxWidth,
-  }) {
+  Widget _buildHeader(bool isSmallScreen) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: ElasticBouncingWidget(
-        onTap: () {
-          if (_soundManager.isSoundOn) {
-            _soundManager.playTapSound();
-          }
-          if (_soundManager.isVibrationOn) {
-            HapticFeedback.lightImpact();
-          }
-          onTap();
-        },
-        child: Container(
-          width: maxWidth,
-          height: 120,
-          decoration: BoxDecoration(
-            color: _currentCardColor,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              // Main shadow for depth
-              BoxShadow(
-                color: _currentShadowColor,
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-              // Subtle glow effect
-              BoxShadow(
-                color: _currentAccentColor.withAlpha(77),
-                blurRadius: 8,
-                spreadRadius: -2,
-                offset: const Offset(0, 0),
-              ),
-            ],
-            border: Border.all(color: _currentAccentColor.withAlpha(102), width: 1.5),
+      padding: EdgeInsets.only(
+          top: isSmallScreen ? 10.0 : 20.0, 
+          left: 16.0, 
+          right: 16.0, 
+          bottom: isSmallScreen ? 10.0 : 20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Theme Switch (Toggle between dark/light)
+          Icon(
+            widget.isDarkTheme ? Icons.nights_stay : Icons.wb_sunny,
+            color: _currentAccentColor,
+            size: 20,
           ),
-          child: Row(
-            children: [
-              const SizedBox(width: 20),
-              // Icon with animated glow
-              AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Icon(
-                    icon,
-                    size: 48,
-                    color: Color.lerp(_currentAccentColor.withAlpha(179), _currentAccentColor, _controller.value),
-                  );
-                },
-              ),
-              const SizedBox(width: 20),
-              // Title and Subtitle
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: _currentTextColor,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      softWrap: true,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: _currentSubtitleColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 20),
-            ],
+          Switch(
+            value: widget.isDarkTheme,
+            onChanged: (value) {
+              widget.onThemeChanged(value);
+              if (_soundManager.isVibrationOn) {
+                HapticFeedback.selectionClick();
+              }
+            },
+            activeThumbColor: _kDarkAccentColor,
+            inactiveThumbColor: _kLightAccentColor,
           ),
+          const SizedBox(width: 8),
+          // Settings Button
+          IconButton(
+            icon: Icon(Icons.settings, size: 28, color: _currentSettingsIconColor),
+            onPressed: () {
+              if (_soundManager.isVibrationOn) {
+                HapticFeedback.lightImpact();
+              }
+              Navigator.push(
+                context,
+                AdvancedPageTransition(page: Settings(
+                  isDarkTheme: widget.isDarkTheme,
+                  onThemeChanged: widget.onThemeChanged,
+                )),
+              );
+            },
+            splashRadius: 28.0,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooter(bool isSmallScreen) {
+    return StaggeredEntrance(
+      delay: const Duration(milliseconds: 300),
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: 20.0, 
+          top: isSmallScreen ? 60.0 : 120.0,
+        ),
+        child: Column(
+          children: [
+            Text(
+              'Made By',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 14,
+                color: _currentSubtitleColor.withAlpha(180),
+                fontWeight: FontWeight.w400,
+                letterSpacing: 1.1,
+              ),
+            ),
+            _buildBrandingText('Abhishek Shah'),
+          ],
         ),
       ),
     );
@@ -162,185 +147,238 @@ class _TicTacToeMenuState extends State<TicTacToeMenu> with SingleTickerProvider
     );
   }
 
+  Widget _buildAdaptiveButton({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required double height,
+    required double iconSize,
+    required double fontSize,
+    required bool isSmall,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: isSmall ? 6.0 : 12.0),
+      child: ElasticBouncingWidget(
+        onTap: () {
+          if (_soundManager.isSoundOn) {
+            _soundManager.playTapSound();
+          }
+          if (_soundManager.isVibrationOn) {
+            HapticFeedback.lightImpact();
+          }
+          onTap();
+        },
+        child: Container(
+          height: height,
+          decoration: BoxDecoration(
+            color: _currentCardColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _currentAccentColor.withAlpha(100), width: 1.5),
+            boxShadow: [
+              // Main shadow for depth
+              BoxShadow(
+                color: _currentShadowColor,
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+              // Subtle glow effect
+              BoxShadow(
+                color: _currentAccentColor.withAlpha(77),
+                blurRadius: 8,
+                spreadRadius: -2,
+                offset: const Offset(0, 0),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              SizedBox(width: isSmall ? 10 : 20),
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Icon(
+                    icon,
+                    size: iconSize,
+                    color: Color.lerp(_currentAccentColor.withAlpha(179), _currentAccentColor, _controller.value),
+                  );
+                },
+              ),
+              SizedBox(width: isSmall ? 10 : 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w900,
+                        color: _currentTextColor,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    SizedBox(height: isSmall ? 2 : 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: isSmall ? 12 : 14,
+                        color: _currentSubtitleColor,
+                      ),
+                      softWrap: true,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final maxWidth = constraints.maxWidth * 0.9;
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: widget.isDarkTheme
+                ? [_kDarkBackgroundColor, _kDarkCardColor]
+                : [const Color(0xFFE5F5FF), _kLightBackgroundColor],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // DETECT SCREEN SIZE
+              final double screenWidth = constraints.maxWidth;
+              final bool isSmallScreen = screenWidth < 370; // Threshold for J7 Prime style devices
+              
+              // Dynamic sizes based on screen
+              final double titleSize = isSmallScreen ? 44 : 64;
+              final double buttonHeight = isSmallScreen ? 90 : 120;
+              final double iconSize = isSmallScreen ? 32 : 48;
+              final double fontSizeTitle = isSmallScreen ? 18 : 24;
 
-          return Container(
-            // Background Gradient
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: widget.isDarkTheme
-                    ? [_kDarkBackgroundColor, _kDarkCardColor]
-                    : [const Color(0xFFE5F5FF), _kLightBackgroundColor],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              children: [
-                // 1. Header (Settings & Theme Switch)
-                Padding(
-                  padding: const EdgeInsets.only(top: 50.0, left: 16.0, right: 16.0, bottom: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // Theme Switch (Toggle between dark/light)
-                      Icon(
-                        widget.isDarkTheme ? Icons.nights_stay : Icons.wb_sunny,
-                        color: _currentAccentColor,
-                        size: 20,
-                      ),
-                      Switch(
-                        value: widget.isDarkTheme,
-                        onChanged: (value) {
-                          widget.onThemeChanged(value);
-                          if (_soundManager.isVibrationOn) {
-                            HapticFeedback.selectionClick();
-                          }
-                          // Saving is handled by settings.dart
-                        },
-                        activeThumbColor: _kDarkAccentColor,
-                        inactiveThumbColor: _kLightAccentColor,
-                      ),
-                      const SizedBox(width: 8),
-                      // Settings Button
-                      IconButton(
-                        icon: Icon(Icons.settings, size: 28, color: _currentSettingsIconColor),
-                        onPressed: () {
-                          if (_soundManager.isVibrationOn) {
-                            HapticFeedback.lightImpact();
-                          }
-                          Navigator.push(
-                            context,
-                            AdvancedPageTransition(page: Settings(
-                              isDarkTheme: widget.isDarkTheme,
-                              onThemeChanged: widget.onThemeChanged, // PASS CALLBACK
-                            )),
-                          );
-                        },
-                        splashRadius: 28.0,
-                      ),
-                    ],
-                  ),
-                ),
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        // 1. Header (Settings)
+                        _buildHeader(isSmallScreen),
 
-                // 2. Title
-                StaggeredEntrance(
-                  delay: const Duration(milliseconds: 100),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Tic Tac Toe',
-                        style: TextStyle(
-                          fontFamily: 'Destacy',
-                          fontSize: 64,
-                          fontWeight: FontWeight.w900,
-                          color: _currentAccentColor,
-                          letterSpacing: 3.0,
-                          shadows: [
-                            BoxShadow(
-                              color: _currentAccentColor.withAlpha(102),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                        // 2. Title Section
+                        StaggeredEntrance(
+                          delay: const Duration(milliseconds: 100),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Tic Tac Toe',
+                                style: TextStyle(
+                                  fontFamily: 'Destacy',
+                                  fontSize: titleSize,
+                                  fontWeight: FontWeight.w900,
+                                  color: _currentAccentColor,
+                                  letterSpacing: 3.0,
+                                  shadows: [
+                                    BoxShadow(
+                                      color: _currentAccentColor.withAlpha(102),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                'Ultimate Edition',
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: isSmallScreen ? 14 : 18,
+                                  color: _currentSubtitleColor,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 2.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const Spacer(flex: 2),
+
+                        // 3. Menu Buttons
+                        StaggeredEntrance(
+                          delay: const Duration(milliseconds: 200),
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 400),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                child: Column(
+                                  children: [
+                                    _buildAdaptiveButton(
+                                      icon: Icons.computer,
+                                      title: 'VS COMPUTER',
+                                      subtitle: 'Play against an intelligent computer opponent',
+                                      height: buttonHeight,
+                                      iconSize: iconSize,
+                                      fontSize: fontSizeTitle,
+                                      isSmall: isSmallScreen,
+                                      onTap: () {
+                                        FirebaseAnalytics.instance.logEvent(
+                                          name: "select_mode",
+                                          parameters: {"mode": "ai"},
+                                        );
+                                        Navigator.push(context, AdvancedPageTransition(page: ComputerScreen(
+                                          isDarkTheme: widget.isDarkTheme,
+                                          onThemeChanged: widget.onThemeChanged,
+                                        )));
+                                      },
+                                    ),
+                                    _buildAdaptiveButton(
+                                      icon: Icons.people_alt,
+                                      title: 'VS FRIEND',
+                                      subtitle: 'Local two-player mode on a single device',
+                                      height: buttonHeight,
+                                      iconSize: iconSize,
+                                      fontSize: fontSizeTitle,
+                                      isSmall: isSmallScreen,
+                                      onTap: () {
+                                        FirebaseAnalytics.instance.logEvent(
+                                          name: "select_mode",
+                                          parameters: {"mode": "pvp"},
+                                        );
+                                        Navigator.push(context, AdvancedPageTransition(page: PlayerScreen(
+                                          isDarkTheme: widget.isDarkTheme,
+                                          onThemeChanged: widget.onThemeChanged,
+                                        )));
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Ultimate Edition',
-                        style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontSize: 18,
-                          color: _currentSubtitleColor,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 2.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
 
-                // 3. Menu Buttons
-                Expanded(
-                  child: StaggeredEntrance(
-                    delay: const Duration(milliseconds: 200),
-                    child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 400),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // VS COMPUTER
-                          _buildMenuButton(
-                            icon: Icons.computer,
-                            title: 'VS COMPUTER',
-                            subtitle: 'Play against an intelligent computer opponent',
-                            onTap: () {
-                              FirebaseAnalytics.instance.logEvent(
-                                name: "select_mode",
-                                parameters: {"mode": "ai"},
-                              );
-                              Navigator.push(context, AdvancedPageTransition(page: ComputerScreen(
-                                isDarkTheme: widget.isDarkTheme,
-                                onThemeChanged: widget.onThemeChanged,
-                              )));
-                            },
-                            maxWidth: maxWidth,
-                          ),
-                          // VS FRIEND
-                          _buildMenuButton(
-                            icon: Icons.people_alt,
-                            title: 'VS FRIEND',
-                            subtitle: 'Local two-player mode on a single device',
-                            onTap: () {
-                              FirebaseAnalytics.instance.logEvent(
-                                name: "select_mode",
-                                parameters: {"mode": "pvp"},
-                              );
-                              Navigator.push(context, AdvancedPageTransition(page: PlayerScreen(
-                                isDarkTheme: widget.isDarkTheme,
-                                onThemeChanged: widget.onThemeChanged,
-                              )));
-                            },
-                            maxWidth: maxWidth,
-                          ),
-                        ],
-                      ),
+                        const Spacer(flex: 3),
+
+                        // 4. Footer
+                        _buildFooter(isSmallScreen),
+                      ],
                     ),
                   ),
                 ),
-                ),
-
-                // 4. Footer Branding
-                StaggeredEntrance(
-                  delay: const Duration(milliseconds: 300),
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0, top: 120.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Made By',
-                        style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontSize: 14,
-                          color: _currentSubtitleColor.withAlpha(180),
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 1.1,
-                        ),
-                      ),
-                      _buildBrandingText('Abhishek Shah'),
-                    ],
-                  ),
-                ),
-                ),
-              ],
-            ),
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
