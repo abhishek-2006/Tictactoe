@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'animated_widgets.dart';
 
 const Color _kDarkAccentColor = Color(0xFF00BCD4);
 const Color _kDarkBackgroundColor = Color(0xFF0F172A);
@@ -138,7 +139,7 @@ class _SettingsState extends State<Settings> {
   }
 
   // --- NEW: Helper to group audio toggles and fix "unused field" warnings ---
-  List<Widget> _audioToggles() {
+  List<Widget> _audioToggles(bool isSmallScreen) {
     return [
       _buildToggleTile(
         'Sound Effects',
@@ -148,6 +149,7 @@ class _SettingsState extends State<Settings> {
           setState(() => _isSoundOn = value);
           _soundManager.setSoundEnabled(value);
         },
+        isSmallScreen
       ),
       _buildToggleTile(
         'Background Music',
@@ -157,6 +159,7 @@ class _SettingsState extends State<Settings> {
           setState(() => _isMusicOn = value);
           _soundManager.setMusicEnabled(value);
         },
+        isSmallScreen
       ),
       _buildToggleTile(
         'Haptic Feedback',
@@ -166,17 +169,18 @@ class _SettingsState extends State<Settings> {
           setState(() => _isVibrationOn = value);
           _soundManager.setVibrationEnabled(value);
         },
+        isSmallScreen
       ),
     ];
   }
 
-  Widget _buildHeader(String title) {
+  Widget _buildHeader(String title, bool isSmallScreen) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: EdgeInsets.only(bottom: isSmallScreen ? 8.0 : 12.0),
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 22,
+          fontSize: isSmallScreen ? 18 : 22,
           fontWeight: FontWeight.w900,
           color: _currentAccentColor,
           letterSpacing: 1.1,
@@ -187,11 +191,14 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 370;
+
     return Scaffold(
       backgroundColor: _currentBackgroundColor,
       appBar: AppBar(
         title: Text('Settings',
-            style: TextStyle(color: _currentAppBarTextColor, fontWeight: FontWeight.bold)
+            style: TextStyle(color: _currentAppBarTextColor, fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 20 : 24)
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -205,13 +212,13 @@ class _SettingsState extends State<Settings> {
             return Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
-                  horizontal: isLargeScreen ? 40.0 : 12.0,
-                  vertical: 20.0,
+                  horizontal: isLargeScreen ? 40.0 : (isSmallScreen ? 8.0 : 12.0),
+                  vertical: isSmallScreen ? 12.0 : 20.0,
                 ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 800),
                   child: Container(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: EdgeInsets.all(isSmallScreen ? 16.0 : 24.0),
                     decoration: BoxDecoration(
                       color: _currentCardColor,
                       borderRadius: BorderRadius.circular(20),
@@ -226,33 +233,58 @@ class _SettingsState extends State<Settings> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildHeader('Appearance'),
-                        _buildToggleTile(
-                            'Dark Theme',
-                            Icons.dark_mode,
-                            _isDarkTheme,
-                                (value) => _setThemeEnabled(value)
+                        StaggeredEntrance(
+                          delay: const Duration(milliseconds: 100),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildHeader('Appearance', isSmallScreen),
+                              _buildToggleTile(
+                                  'Dark Theme',
+                                  Icons.dark_mode,
+                                  _isDarkTheme,
+                                      (value) => _setThemeEnabled(value),
+                                  isSmallScreen
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 30),
-                        _buildHeader('Audio & Haptics'),
-                        isLargeScreen
-                            ? GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount: 2,
-                          childAspectRatio: 4,
-                          crossAxisSpacing: 20,
-                          children: _audioToggles(),
-                        )
-                            : Column(children: _audioToggles()),
-                        const SizedBox(height: 30),
-                        _buildHeader('About Game'),
-                        Text(
-                          'Tic-Tac-Toe is the classic game of Xs and Os against a friend or four unique CPU difficulties, including the unbeatable AI.',
-                          style: TextStyle(
-                            fontSize: 16,
-                            height: 1.5,
-                            color: _currentTextColor.withAlpha(179),
+                        SizedBox(height: isSmallScreen ? 20 : 30),
+                        StaggeredEntrance(
+                          delay: const Duration(milliseconds: 200),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildHeader('Audio & Haptics', isSmallScreen),
+                              isLargeScreen
+                                  ? GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 2,
+                                childAspectRatio: 4,
+                                crossAxisSpacing: 20,
+                                children: _audioToggles(isSmallScreen),
+                              )
+                                  : Column(children: _audioToggles(isSmallScreen)),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: isSmallScreen ? 20 : 30),
+                        StaggeredEntrance(
+                          delay: const Duration(milliseconds: 300),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildHeader('About Game', isSmallScreen),
+                              Text(
+                                'Tic-Tac-Toe is the classic game of Xs and Os against a friend or four unique CPU difficulties, including the unbeatable AI.',
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 14 : 16,
+                                  height: 1.5,
+                                  color: _currentTextColor.withAlpha(179),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -266,14 +298,14 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  Widget _buildToggleTile(String title, IconData icon, bool value, Function(bool) onChanged) {
+  Widget _buildToggleTile(String title, IconData icon, bool value, Function(bool) onChanged, bool isSmallScreen) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: _currentAccentColor),
+      leading: Icon(icon, color: _currentAccentColor, size: isSmallScreen ? 20 : 24),
       title: Text(
         title,
         style: TextStyle(
-          fontSize: 18,
+          fontSize: isSmallScreen ? 15 : 18,
           color: _currentTextColor,
         ),
       ),

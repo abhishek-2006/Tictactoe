@@ -46,10 +46,11 @@ class ComputerScreenState extends State<ComputerScreen> {
     required Widget screen,
     required IconData icon,
     bool isGridMode = false,
+    bool isSmallScreen = false,
   }) {
     return Padding(
       padding: EdgeInsets.symmetric(
-          horizontal: isGridMode ? 8.0 : 24.0,
+          horizontal: isGridMode ? 8.0 : (isSmallScreen ? 16.0 : 24.0),
           vertical: isGridMode ? 8.0 : 12.0
       ),
       child: ElasticBouncingWidget(
@@ -68,7 +69,7 @@ class ComputerScreenState extends State<ComputerScreen> {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(isSmallScreen && !isGridMode ? 16.0 : 20.0),
             child: isGridMode
                 ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -87,13 +88,13 @@ class ComputerScreenState extends State<ComputerScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(text, style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: color, letterSpacing: 1.5)),
+                      Text(text, style: TextStyle(fontSize: isSmallScreen ? 24 : 32, fontWeight: FontWeight.w900, color: color, letterSpacing: 1.5)),
                       const SizedBox(height: 4),
-                      Text(_getModeDescription(text), style: TextStyle(fontSize: 16, color: _currentTextColor.withAlpha(179))),
+                      Text(_getModeDescription(text), style: TextStyle(fontSize: isSmallScreen ? 14 : 16, color: _currentTextColor.withAlpha(179))),
                     ],
                   ),
                 ),
-                Icon(icon, size: 50, color: color.withAlpha(204)),
+                Icon(icon, size: isSmallScreen ? 40 : 50, color: color.withAlpha(204)),
               ],
             ),
           ),
@@ -127,6 +128,7 @@ class ComputerScreenState extends State<ComputerScreen> {
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
+            bool isSmallScreen = constraints.maxWidth < 370;
             bool isMobile = constraints.maxWidth <= 600;
             bool isTablet = constraints.maxWidth > 600 && constraints.maxWidth <= 1000;
             bool isDesktop = constraints.maxWidth > 1000;
@@ -148,7 +150,7 @@ class ComputerScreenState extends State<ComputerScreen> {
                           style: TextStyle(
                               color: _currentAppBarTextColor,
                               fontWeight: FontWeight.bold,
-                              fontSize: 24)),
+                              fontSize: isSmallScreen ? 20 : 24)),
                     ],
                   ),
                   actions: [
@@ -180,7 +182,7 @@ class ComputerScreenState extends State<ComputerScreen> {
                           if (isMobile)
                             SliverList(
                               delegate: SliverChildListDelegate([
-                                _buildCards(false),
+                                _buildCards(false, isSmallScreen),
                               ]),
                             )
                           else if (isTablet)
@@ -193,7 +195,7 @@ class ComputerScreenState extends State<ComputerScreen> {
                                     mainAxisSpacing: 40,
                                     crossAxisSpacing: 40,
                                   ),
-                                  delegate: SliverChildListDelegate(_buildGridCards(true)),
+                                  delegate: SliverChildListDelegate(_buildGridCards(true, isSmallScreen)),
                                 ),
                               )
                           else
@@ -206,7 +208,7 @@ class ComputerScreenState extends State<ComputerScreen> {
                                   mainAxisSpacing: 40,
                                   crossAxisSpacing: 40,
                                 ),
-                                delegate: SliverChildListDelegate(_buildGridCards(true)),
+                                delegate: SliverChildListDelegate(_buildGridCards(true, isSmallScreen)),
                               ),
                             ),
                         ],
@@ -223,19 +225,19 @@ class ComputerScreenState extends State<ComputerScreen> {
   }
 
   // Helper for Column (Mobile)
-  Widget _buildCards(bool isGrid) {
+  Widget _buildCards(bool isGrid, bool isSmallScreen) {
     return Column(
-      children: _buildGridCards(isGrid),
+      children: _buildGridCards(isGrid, isSmallScreen),
     );
   }
 
   // Common list of cards
-  List<Widget> _buildGridCards(bool isGrid) {
+  List<Widget> _buildGridCards(bool isGrid, bool isSmallScreen) {
     return [
-      StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildInteractiveCard(text: 'EASY', color: _kEasyColor, icon: Icons.grass, screen: EasyMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid)),
-      StaggeredEntrance(delay: const Duration(milliseconds: 200), child: _buildInteractiveCard(text: 'MEDIUM', color: _kMediumColor, icon: Icons.bolt, screen: MediumMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid)),
-      StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildInteractiveCard(text: 'HARD', color: _kHardColor, icon: Icons.hardware, screen: HardMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid)),
-      StaggeredEntrance(delay: const Duration(milliseconds: 400), child: _buildInteractiveCard(text: 'LEGEND', color: _kLegendColor, icon: Icons.workspace_premium, screen: LegendMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid)),
+      StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildInteractiveCard(text: 'EASY', color: _kEasyColor, icon: Icons.grass, screen: EasyMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid, isSmallScreen: isSmallScreen)),
+      StaggeredEntrance(delay: const Duration(milliseconds: 200), child: _buildInteractiveCard(text: 'MEDIUM', color: _kMediumColor, icon: Icons.bolt, screen: MediumMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid, isSmallScreen: isSmallScreen)),
+      StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildInteractiveCard(text: 'HARD', color: _kHardColor, icon: Icons.hardware, screen: HardMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid, isSmallScreen: isSmallScreen)),
+      StaggeredEntrance(delay: const Duration(milliseconds: 400), child: _buildInteractiveCard(text: 'LEGEND', color: _kLegendColor, icon: Icons.workspace_premium, screen: LegendMode(isDarkTheme: widget.isDarkTheme, onThemeChanged: widget.onThemeChanged), isGridMode: isGrid, isSmallScreen: isSmallScreen)),
     ];
   }
 }

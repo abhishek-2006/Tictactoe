@@ -262,31 +262,31 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildScoreboard() {
+  Widget _buildScoreboard(bool isSmallScreen) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildScoreColumn(label: 'PLAYER (X)', score: _playerXScore, color: _kPlayerXColor),
-        _buildScoreColumn(label: 'DRAWS', score: _draws, color: _isDark ? Colors.cyan : Colors.blue),
-        _buildScoreColumn(label: 'CPU (O)', score: _cpuOScore, color: _kPlayerOColor),
+        _buildScoreColumn(label: 'PLAYER (X)', score: _playerXScore, color: _kPlayerXColor, isSmallScreen: isSmallScreen),
+        _buildScoreColumn(label: 'DRAWS', score: _draws, color: _isDark ? Colors.cyan : Colors.blue, isSmallScreen: isSmallScreen),
+        _buildScoreColumn(label: 'CPU (O)', score: _cpuOScore, color: _kPlayerOColor, isSmallScreen: isSmallScreen),
       ],
     );
   }
 
-  Widget _buildScoreColumn({required String label, required int score, required Color color}) {
+  Widget _buildScoreColumn({required String label, required int score, required Color color, required bool isSmallScreen}) {
     return Column(
       children: [
-        Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: color.withAlpha(204))),
+        Text(label, style: TextStyle(fontSize: isSmallScreen ? 12 : 16, fontWeight: FontWeight.w600, color: color.withAlpha(204))),
         const SizedBox(height: 4),
-        Text('$score', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: color)),
+        Text('$score', style: TextStyle(fontSize: isSmallScreen ? 28 : 36, fontWeight: FontWeight.w900, color: color)),
       ],
     );
   }
 
-  Widget _buildBoard() {
-    const double boardSize = 330;
+  Widget _buildBoard(bool isSmallScreen) {
+    final double boardSize = isSmallScreen ? 280 : 330;
     const double lineThickness = 3.0;
-    const double cellSize = (boardSize - (2 * lineThickness)) / 3;
+    final double cellSize = (boardSize - (2 * lineThickness)) / 3;
 
     return Container(
       width: boardSize,
@@ -307,7 +307,7 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
               child: AnimatedBuilder(
                 animation: _lineAnimation,
                 builder: (context, child) => CustomPaint(
-                  size: const Size(boardSize, boardSize),
+                  size: Size(boardSize, boardSize),
                   painter: WinningLinePainter(
                     winType: _winType!,
                     index: _winIndex,
@@ -342,6 +342,9 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 370;
+
     return Scaffold(
       backgroundColor: _currentBackgroundColor,
       appBar: AppBar(
@@ -362,25 +365,25 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
           physics: const NeverScrollableScrollPhysics(),
           child: Column(
             children: [
-              const SizedBox(height: 40.0),
-              StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildScoreboard()),
-              const SizedBox(height: 40.0),
+              SizedBox(height: isSmallScreen ? 20.0 : 40.0),
+              StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildScoreboard(isSmallScreen)),
+              SizedBox(height: isSmallScreen ? 20.0 : 40.0),
               StaggeredEntrance(
                 delay: const Duration(milliseconds: 200),
                 child: PulsingText(
                   text: _message,
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: _message.startsWith('Player X') ? _kPlayerXColor : _message.startsWith('CPU') ? _kPlayerOColor : _currentTextColor)
+                  style: TextStyle(fontSize: isSmallScreen ? 22 : 28, fontWeight: FontWeight.bold, color: _message.startsWith('Player X') ? _kPlayerXColor : _message.startsWith('CPU') ? _kPlayerOColor : _currentTextColor)
                 ),
               ),
-              const SizedBox(height: 30.0),
-              StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildBoard()),
-              const SizedBox(height: 40.0),
+              SizedBox(height: isSmallScreen ? 20.0 : 30.0),
+              StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildBoard(isSmallScreen)),
+              SizedBox(height: isSmallScreen ? 20.0 : 40.0),
               StaggeredEntrance(
                 delay: const Duration(milliseconds: 400),
                 child: ElasticBouncingWidget(
                 onTap: _resetGame,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 20 : 40, vertical: isSmallScreen ? 10 : 15),
                   decoration: const ShapeDecoration(
                     color: _kLegendModeColor,
                     shape: StadiumBorder(),
@@ -388,10 +391,10 @@ class LegendModeState extends State<LegendMode> with TickerProviderStateMixin {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.refresh, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text('New Game', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                    children: [
+                      Icon(Icons.refresh, color: Colors.white, size: isSmallScreen ? 22 : 24),
+                      const SizedBox(width: 8),
+                      Text('New Game', style: TextStyle(fontSize: isSmallScreen ? 16 : 20, fontWeight: FontWeight.bold, color: Colors.white)),
                     ],
                   ),
                 ),
