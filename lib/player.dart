@@ -139,14 +139,12 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
       return true;
     }
 
-    // Check Main Diagonal (top-left to bottom-right)
     if (row == col && List.generate(3, (i) => _board[i][i]).every((cell) => cell == player)) {
       _winType = WinType.diagonalMain;
       _winIndex = 0;
       return true;
     }
 
-    // Check Anti-Diagonal (top-right to bottom-left)
     if (row + col == 2 && List.generate(3, (i) => _board[i][2 - i]).every((cell) => cell == player)) {
       _winType = WinType.diagonalAnti;
       _winIndex = 2;
@@ -202,9 +200,7 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
     );
   }
 
-  // --- UI Building Widgets ---
-
-  Widget _buildScoreboard() {
+  Widget _buildScoreboard(bool isSmallScreen) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -213,30 +209,33 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
           label: 'PLAYER X',
           score: _playerXScore,
           color: _kPlayerXColor,
+          isSmallScreen: isSmallScreen,
         ),
         // Draws Score
         _buildScoreColumn(
           label: 'DRAWS',
           score: _draws,
           color: _currentAccentColor,
+          isSmallScreen: isSmallScreen,
         ),
         // Player O Score
         _buildScoreColumn(
           label: 'PLAYER O',
           score: _playerOScore,
           color: _kPlayerOColor,
+          isSmallScreen: isSmallScreen,
         ),
       ],
     );
   }
 
-  Widget _buildScoreColumn({required String label, required int score, required Color color}) {
+  Widget _buildScoreColumn({required String label, required int score, required Color color, required bool isSmallScreen}) {
     return Column(
       children: [
         Text(
           label,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: isSmallScreen ? 12 : 16,
             fontWeight: FontWeight.w600,
             color: color.withAlpha(204),
           ),
@@ -245,7 +244,7 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
         Text(
           '$score',
           style: TextStyle(
-            fontSize: 36,
+            fontSize: isSmallScreen ? 28 : 36,
             fontWeight: FontWeight.w900,
             color: color,
             shadows: [
@@ -261,12 +260,10 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildBoard() {
-    // Corrected board size calculation to prevent line flow-out.
-    const double boardSize = 330;
+  Widget _buildBoard(bool isSmallScreen) {
+    final double boardSize = isSmallScreen ? 280 : 330;
     const double lineThickness = 3.0;
-    // Calculate cell size: (Total Size - Total Line Width) / Number of Cells
-    const double cellSize = (boardSize - (2 * lineThickness)) / 3; // (330 - 6) / 3 = 108.0
+    final double cellSize = (boardSize - (2 * lineThickness)) / 3;
 
     return SizedBox(
       width: boardSize,
@@ -279,7 +276,6 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
           decoration: BoxDecoration(
             color: _currentCardColor,
             borderRadius: BorderRadius.circular(12),
-            // Applying a subtle shadow for depth
             boxShadow: [
               BoxShadow(
                 color: _currentBoardLineColor.withAlpha(77),
@@ -298,7 +294,6 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
             children: List.generate(3, (row) {
               return TableRow(
                 children: List.generate(3, (col) {
-                  // Now passing the calculated cellSize
                   return _buildCell(row, col, cellSize);
                 }),
               );
@@ -306,13 +301,12 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
           ),
           ),
 
-          // Winning line overlay
           if (_winType != null)
             AnimatedBuilder(
               animation: _lineController,
               builder: (context, child) {
                 return CustomPaint(
-                  size: const Size(boardSize, boardSize),
+                  size: Size(boardSize, boardSize),
                   painter: WinningLinePainter(
                     winType: _winType!,
                     index: _winIndex,
@@ -349,6 +343,9 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 370;
+
     return Scaffold(
       backgroundColor: _currentBackgroundColor,
       appBar: AppBar(
@@ -385,9 +382,9 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
 
-              StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildScoreboard()),
+              StaggeredEntrance(delay: const Duration(milliseconds: 100), child: _buildScoreboard(isSmallScreen)),
 
-              const SizedBox(height: 60.0),
+              SizedBox(height: isSmallScreen ? 30.0 : 60.0),
 
               StaggeredEntrance(
                 delay: const Duration(milliseconds: 200),
@@ -396,7 +393,7 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
                   child: PulsingText(
                     text: _message,
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: isSmallScreen ? 22 : 28,
                       fontWeight: FontWeight.bold,
                       color: _message.contains('X Turn') ? _kPlayerXColor : _message.contains('O Turn') ? _kPlayerOColor : _currentTextColor,
                     ),
@@ -404,12 +401,15 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
                 ),
               ),
 
-              StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildBoard()),
+              StaggeredEntrance(delay: const Duration(milliseconds: 300), child: _buildBoard(isSmallScreen)),
 
               StaggeredEntrance(
                 delay: const Duration(milliseconds: 400),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 40.0, bottom: 40.0),
+                  padding: EdgeInsets.only(
+                    top: isSmallScreen ? 20.0 : 40.0, 
+                    bottom: isSmallScreen ? 20.0 : 40.0
+                  ),
                   child: ElasticBouncingWidget(
                     onTap: () {
                     HapticFeedback.lightImpact();
@@ -417,12 +417,15 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
                   },
                   child: ElevatedButton.icon(
                     onPressed: () {}, // Handled by BouncingWidget
-                    icon: const Icon(Icons.refresh, size: 28),
-                    label: const Text('New Game', style: TextStyle(fontSize: 20)),
+                    icon: Icon(Icons.refresh, size: isSmallScreen ? 22 : 28),
+                    label: Text('New Game', style: TextStyle(fontSize: isSmallScreen ? 16 : 20)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _currentAccentColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 20 : 30, 
+                        vertical: isSmallScreen ? 10 : 15
+                      ),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 5,
                     ),
