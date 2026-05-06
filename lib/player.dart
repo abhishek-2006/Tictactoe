@@ -415,19 +415,32 @@ class _PlayerScreenState extends State<PlayerScreen> with SingleTickerProviderSt
                     HapticFeedback.lightImpact();
                     _resetGame();
                   },
-                  child: ElevatedButton.icon(
-                    onPressed: () {}, // Handled by BouncingWidget
-                    icon: Icon(Icons.refresh, size: isSmallScreen ? 22 : 28),
-                    label: Text('New Game', style: TextStyle(fontSize: isSmallScreen ? 16 : 20)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _currentAccentColor,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isSmallScreen ? 20 : 30, 
-                        vertical: isSmallScreen ? 10 : 15
-                      ),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      elevation: 5,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isSmallScreen ? 20 : 30, 
+                      vertical: isSmallScreen ? 10 : 15
+                    ),
+                    decoration: BoxDecoration(
+                      color: _currentAccentColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 2))
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.refresh, color: Colors.white, size: isSmallScreen ? 22 : 28),
+                        const SizedBox(width: 8),
+                        Text(
+                          'New Game', 
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 16 : 20, 
+                            fontWeight: FontWeight.bold, 
+                            color: Colors.white
+                          )
+                        ),
+                      ],
                     ),
                   ),
                 ),
